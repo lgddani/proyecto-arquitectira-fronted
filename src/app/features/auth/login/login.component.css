@@ -34,8 +34,152 @@
   width: 100%;
 }
 
-.form-field .mat-mdc-form-field {
+.form-field label {
+  display: block;
+  margin-bottom: 8px;
+  color: var(--text-secondary);
+  font-weight: 500;
+  font-size: 0.9rem;
+}
+
+.input-container {
+  position: relative;
   width: 100%;
+}
+
+.input-container input {
+  width: 100%;
+  padding: 16px 50px 16px 16px;
+  border: 2px solid var(--border-color);
+  border-radius: 8px;
+  font-size: 1rem;
+  background: white;
+  color: var(--text-primary);
+  transition: all 0.3s ease;
+  box-sizing: border-box;
+}
+
+.input-container input:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(139, 69, 19, 0.1);
+}
+
+.input-container input::placeholder {
+  color: var(--text-light);
+}
+
+.input-icon {
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 1.2rem;
+}
+
+.password-toggle {
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1.2rem;
+  padding: 4px;
+  border-radius: 4px;
+  transition: background 0.3s ease;
+}
+
+.password-toggle:hover {
+  background: rgba(139, 69, 19, 0.1);
+}
+
+.error-message {
+  color: var(--error-color);
+  font-size: 0.8rem;
+  margin-top: 4px;
+  margin-left: 4px;
+}
+
+/* Checkbox personalizado */
+.checkbox-container {
+  display: flex;
+  align-items: center;
+  position: relative;
+  cursor: pointer;
+  font-size: 0.9rem;
+  color: var(--text-primary);
+}
+
+.checkbox-container input {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+  height: 0;
+  width: 0;
+}
+
+.checkmark {
+  height: 18px;
+  width: 18px;
+  background-color: white;
+  border: 2px solid var(--border-color);
+  border-radius: 3px;
+  margin-right: 8px;
+  transition: all 0.3s ease;
+}
+
+.checkbox-container:hover input ~ .checkmark {
+  border-color: var(--primary-color);
+}
+
+.checkbox-container input:checked ~ .checkmark {
+  background-color: var(--primary-color);
+  border-color: var(--primary-color);
+}
+
+.checkmark:after {
+  content: "";
+  position: absolute;
+  display: none;
+}
+
+.checkbox-container input:checked ~ .checkmark:after {
+  display: block;
+}
+
+.checkbox-container .checkmark:after {
+  left: 5px;
+  top: 2px;
+  width: 4px;
+  height: 8px;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+/* Spinner personalizado */
+.spinner {
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  border-top: 2px solid white;
+  width: 20px;
+  height: 20px;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Divider */
+.divider {
+  margin: 24px 0;
+  border: none;
+  height: 1px;
+  background-color: var(--border-color);
 }
 
 /* Opciones del formulario */
@@ -141,59 +285,6 @@
   width: 16px !important;
   height: 16px !important;
   color: var(--info-color);
-}
-
-/* Personalización de Angular Material */
-::ng-deep .login-container {
-  
-  /* Form fields */
-  .mat-mdc-form-field-outline {
-    color: var(--border-color);
-  }
-  
-  .mat-mdc-form-field.mat-focused .mat-mdc-form-field-outline {
-    color: var(--primary-color);
-  }
-  
-  .mat-mdc-form-field-label {
-    color: var(--text-secondary);
-  }
-  
-  .mat-mdc-form-field.mat-focused .mat-mdc-form-field-label {
-    color: var(--primary-color);
-  }
-  
-  /* Checkbox */
-  .mat-mdc-checkbox.mat-primary {
-    --mdc-checkbox-selected-icon-color: var(--primary-color);
-    --mdc-checkbox-selected-hover-icon-color: var(--primary-color);
-    --mdc-checkbox-selected-pressed-icon-color: var(--primary-color);
-  }
-  
-  .mat-mdc-checkbox .mdc-form-field {
-    color: var(--text-primary);
-    font-size: 0.9rem;
-  }
-  
-  /* Error messages */
-  .mat-mdc-form-field-error {
-    font-size: 0.8rem;
-    color: var(--error-color);
-  }
-  
-  /* Input focus */
-  .mat-mdc-input-element:focus {
-    outline: none;
-  }
-  
-  /* Icons */
-  .mat-icon {
-    color: var(--text-secondary);
-  }
-  
-  .mat-mdc-form-field.mat-focused .mat-icon {
-    color: var(--primary-color);
-  }
 }
 
 /* Responsive */
