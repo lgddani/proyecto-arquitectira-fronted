@@ -1,0 +1,330 @@
+<div class="ingredients-container">
+  
+  <!-- Header -->
+  <div class="page-header">
+    <div class="header-content">
+      <div class="header-text">
+        <h1>Gestión de Ingredientes</h1>
+        <p>Administra el inventario de ingredientes para Diego's Wafles</p>
+      </div>
+      <div class="header-actions">
+        <button mat-raised-button (click)="openCreateModal()" class="create-btn">
+          <mat-icon>add</mat-icon>
+          Nuevo Ingrediente
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Contenido principal -->
+  <div class="main-content">
+    
+    <!-- Barra de búsqueda -->
+    <mat-card class="search-card">
+      <mat-card-content>
+        <div class="search-section">
+          <mat-form-field appearance="outline" class="search-field">
+            <mat-label>Buscar ingredientes</mat-label>
+            <input matInput 
+                   [(ngModel)]="searchValue"
+                   (keyup)="applyFilter($event)" 
+                   placeholder="Nombre del ingrediente">
+            <mat-icon matSuffix>search</mat-icon>
+          </mat-form-field>
+          
+          <button mat-button 
+                  *ngIf="searchValue" 
+                  (click)="clearFilter()" 
+                  class="clear-btn">
+            <mat-icon>clear</mat-icon>
+            Limpiar
+          </button>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Tabla de ingredientes -->
+    <mat-card class="table-card">
+      <mat-card-header>
+        <mat-card-title>
+          <mat-icon>inventory_2</mat-icon>
+          Lista de Ingredientes
+        </mat-card-title>
+        <mat-card-subtitle>
+          Total: {{ dataSource.data.length }} ingrediente(s)
+        </mat-card-subtitle>
+      </mat-card-header>
+      
+      <mat-card-content>
+        
+        <!-- Loading -->
+        <div *ngIf="loading" class="loading-container">
+          <mat-spinner diameter="40"></mat-spinner>
+          <p class="loading-text">Cargando ingredientes...</p>
+        </div>
+
+        <!-- Tabla -->
+        <div *ngIf="!loading" class="table-container">
+          
+          <!-- Sin datos -->
+          <div *ngIf="dataSource.data.length === 0" class="empty-state">
+            <mat-icon>inventory_2</mat-icon>
+            <h3>No hay ingredientes registrados</h3>
+            <p>Comienza agregando tu primer ingrediente</p>
+            <button mat-raised-button (click)="openCreateModal()">
+              <mat-icon>add</mat-icon>
+              Agregar Ingrediente
+            </button>
+          </div>
+
+          <!-- Tabla con datos -->
+          <table mat-table 
+                 [dataSource]="dataSource" 
+                 matSort 
+                 *ngIf="dataSource.data.length > 0"
+                 class="ingredients-table">
+
+            <!-- Columna Nombre -->
+            <ng-container matColumnDef="ingredientName">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>
+                <mat-icon>label</mat-icon>
+                Ingrediente
+              </th>
+              <td mat-cell *matCellDef="let ingredient">
+                <div class="ingredient-name">
+                  <strong>{{ ingredient.ingredientName }}</strong>
+                </div>
+              </td>
+            </ng-container>
+
+            <!-- Columna Cantidad -->
+            <ng-container matColumnDef="quantity">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>
+                <mat-icon>straighten</mat-icon>
+                Cantidad
+              </th>
+              <td mat-cell *matCellDef="let ingredient">
+                <div class="quantity-info">
+                  <span class="current-quantity">{{ ingredient.ingredientQuantity }}</span>
+                  <small class="minimum-quantity">Min: {{ ingredient.minimumQuantity }}</small>
+                </div>
+              </td>
+            </ng-container>
+
+            <!-- Columna Unidad -->
+            <ng-container matColumnDef="unit">
+              <th mat-header-cell *matHeaderCellDef>
+                <mat-icon>scale</mat-icon>
+                Unidad
+              </th>
+              <td mat-cell *matCellDef="let ingredient">
+                <mat-chip class="unit-chip">{{ ingredient.ingredientUnit }}</mat-chip>
+              </td>
+            </ng-container>
+
+            <!-- Columna Proveedor -->
+            <ng-container matColumnDef="provider">
+              <th mat-header-cell *matHeaderCellDef>
+                <mat-icon>business</mat-icon>
+                Proveedor
+              </th>
+              <td mat-cell *matCellDef="let ingredient">
+                <div class="provider-info">
+                  {{ ingredient.providerName }}
+                </div>
+              </td>
+            </ng-container>
+
+            <!-- Columna Estado -->
+            <ng-container matColumnDef="status">
+              <th mat-header-cell *matHeaderCellDef>
+                <mat-icon>info</mat-icon>
+                Estado
+              </th>
+              <td mat-cell *matCellDef="let ingredient">
+                <div class="status-container">
+                  <mat-chip 
+                    [class]="'status-chip status-' + getStockStatus(ingredient)">
+                    <mat-icon class="status-icon">{{ getStockStatusIcon(ingredient) }}</mat-icon>
+                    {{ getStockStatusText(ingredient) }}
+                  </mat-chip>
+                </div>
+              </td>
+            </ng-container>
+
+            <!-- Columna Acciones -->
+            <ng-container matColumnDef="actions">
+              <th mat-header-cell *matHeaderCellDef>Acciones</th>
+              <td mat-cell *matCellDef="let ingredient">
+                <div class="actions-container">
+                  <button mat-icon-button 
+                          (click)="openViewModal(ingredient)"
+                          matTooltip="Ver detalles"
+                          class="view-btn">
+                    <mat-icon>visibility</mat-icon>
+                  </button>
+                  
+                  <button mat-icon-button 
+                          (click)="openEditModal(ingredient)"
+                          matTooltip="Editar ingrediente"
+                          class="edit-btn">
+                    <mat-icon>edit</mat-icon>
+                  </button>
+                  
+                  <button mat-icon-button 
+                          (click)="deleteIngredient(ingredient)"
+                          matTooltip="Eliminar ingrediente"
+                          class="delete-btn">
+                    <mat-icon>delete</mat-icon>
+                  </button>
+                </div>
+              </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;" 
+                class="ingredient-row"></tr>
+            
+          </table>
+
+          <!-- Paginador -->
+          <mat-paginator 
+            *ngIf="dataSource.data.length > 0"
+            [pageSizeOptions]="[5, 10, 25, 50]"
+            showFirstLastButtons
+            class="table-paginator">
+          </mat-paginator>
+          
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+  </div>
+</div>
+
+<!-- Modal para CRUD de ingredientes -->
+<div class="modal-overlay" *ngIf="showModal" (click)="closeModal()">
+  <div class="modal-container" (click)="$event.stopPropagation()">
+    
+    <!-- Header del modal -->
+    <div class="modal-header">
+      <div class="modal-title">
+        <mat-icon [class]="'modal-icon ' + modalData.mode">{{ getModalIcon() }}</mat-icon>
+        <h2>{{ getModalTitle() }}</h2>
+      </div>
+      <button mat-icon-button (click)="closeModal()" class="close-btn">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+
+    <!-- Contenido del modal -->
+    <div class="modal-content">
+      <form [formGroup]="ingredientForm" (ngSubmit)="onSubmit()">
+        
+        <!-- Campo Nombre -->
+        <mat-form-field appearance="outline" class="form-field">
+          <mat-label>Nombre del Ingrediente</mat-label>
+          <input matInput 
+                 formControlName="ingredientName"
+                 placeholder="Ej: Harina, Azúcar, Huevos..."
+                 [readonly]="isViewMode()">
+          <mat-icon matSuffix>label</mat-icon>
+          <mat-error>{{ getIngredientNameError() }}</mat-error>
+        </mat-form-field>
+
+        <!-- Fila de Cantidad y Unidad -->
+        <div class="form-row">
+          <mat-form-field appearance="outline" class="form-field half-width">
+            <mat-label>Cantidad Actual</mat-label>
+            <input matInput 
+                   type="number"
+                   formControlName="ingredientQuantity"
+                   placeholder="0"
+                   [readonly]="isViewMode()">
+            <mat-icon matSuffix>straighten</mat-icon>
+            <mat-error>{{ getQuantityError() }}</mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="form-field half-width">
+            <mat-label>Unidad de Medida</mat-label>
+            <mat-select formControlName="ingredientUnit" [disabled]="isViewMode()">
+              <mat-option *ngFor="let unit of units" [value]="unit">
+                {{ getUnitLabel(unit) }} ({{ unit }})
+              </mat-option>
+            </mat-select>
+            <mat-icon matSuffix>scale</mat-icon>
+            <mat-error>{{ getUnitError() }}</mat-error>
+          </mat-form-field>
+        </div>
+
+        <!-- Campo Cantidad Mínima -->
+        <mat-form-field appearance="outline" class="form-field">
+          <mat-label>Cantidad Mínima</mat-label>
+          <input matInput 
+                 type="number"
+                 formControlName="minimumQuantity"
+                 placeholder="0"
+                 [readonly]="isViewMode()">
+          <mat-icon matSuffix>warning</mat-icon>
+          <mat-hint>Cantidad mínima para generar alerta de stock bajo</mat-hint>
+          <mat-error>{{ getMinimumQuantityError() }}</mat-error>
+        </mat-form-field>
+
+        <!-- Campo Proveedor -->
+        <mat-form-field appearance="outline" class="form-field">
+          <mat-label>Proveedor</mat-label>
+          <mat-select formControlName="providerID" [disabled]="isViewMode()">
+            <mat-option *ngFor="let provider of providers" [value]="provider.providerID">
+              {{ provider.providerName }}
+            </mat-option>
+          </mat-select>
+          <mat-icon matSuffix>business</mat-icon>
+          <mat-error>{{ getProviderError() }}</mat-error>
+        </mat-form-field>
+
+        <!-- Información adicional en modo ver -->
+        <div *ngIf="isViewMode() && modalData.ingredient" class="view-info">
+          <div class="info-section">
+            <h4>Información del Stock</h4>
+            <div class="info-grid">
+              <div class="info-item">
+                <mat-icon>badge</mat-icon>
+                <span>ID: {{ modalData.ingredient.ingredientID }}</span>
+              </div>
+              <div class="info-item">
+                <mat-icon>{{ getStockStatusIcon(modalData.ingredient) }}</mat-icon>
+                <span>{{ getStockStatusText(modalData.ingredient) }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </form>
+    </div>
+
+    <!-- Footer del modal -->
+    <div class="modal-footer">
+      <button mat-button (click)="closeModal()" class="cancel-btn">
+        {{ isViewMode() ? 'Cerrar' : 'Cancelar' }}
+      </button>
+      
+      <button mat-raised-button 
+              (click)="onSubmit()"
+              [disabled]="modalLoading || isViewMode()"
+              *ngIf="!isViewMode()"
+              class="submit-btn">
+        
+        <div *ngIf="!modalLoading" class="button-content">
+          <mat-icon>{{ modalData.mode === 'create' ? 'add' : 'save' }}</mat-icon>
+          {{ modalData.mode === 'create' ? 'Registrar' : 'Actualizar' }}
+        </div>
+        
+        <div *ngIf="modalLoading" class="button-loading">
+          <mat-spinner diameter="20"></mat-spinner>
+          {{ modalData.mode === 'create' ? 'Registrando...' : 'Actualizando...' }}
+        </div>
+      </button>
+    </div>
+
+  </div>
+</div>

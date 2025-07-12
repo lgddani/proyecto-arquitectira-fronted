@@ -1,0 +1,724 @@
+/* src/app/features/ingredients/ingredients.component.css */
+
+.ingredients-container {
+  padding: 0;
+  min-height: calc(100vh - 120px);
+  background: var(--background-color);
+}
+
+/* ========================================
+   HEADER DE LA PÁGINA
+   ======================================== */
+
+.page-header {
+  background: linear-gradient(135deg, #FF9800, #FF8A65);
+  color: white;
+  padding: 32px 24px;
+  margin-bottom: 24px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.header-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 24px;
+}
+
+.header-text h1 {
+  font-size: 2.2rem;
+  font-weight: 300;
+  margin: 0 0 8px 0;
+  line-height: 1.2;
+}
+
+.header-text p {
+  font-size: 1.1rem;
+  opacity: 0.9;
+  margin: 0;
+}
+
+.header-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.create-btn {
+  height: 48px;
+  border-radius: 24px;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s ease;
+  background: white !important;
+  color: #FF9800 !important;
+}
+
+.create-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+}
+
+/* ========================================
+   CONTENIDO PRINCIPAL
+   ======================================== */
+
+.main-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* ========================================
+   BARRA DE BÚSQUEDA
+   ======================================== */
+
+.search-card {
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  border: none;
+}
+
+.search-section {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.search-field {
+  flex: 1;
+  max-width: 400px;
+}
+
+.clear-btn {
+  border-radius: 20px;
+  color: var(--text-secondary);
+}
+
+/* ========================================
+   TABLA DE INGREDIENTES
+   ======================================== */
+
+.table-card {
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  border: none;
+}
+
+.table-card mat-card-header {
+  padding-bottom: 16px;
+}
+
+.table-card mat-card-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--text-primary);
+  font-size: 1.4rem;
+  font-weight: 500;
+}
+
+.table-card mat-card-subtitle {
+  color: var(--text-secondary);
+  margin-top: 4px;
+}
+
+.table-container {
+  width: 100%;
+  overflow: auto;
+}
+
+.ingredients-table {
+  width: 100%;
+  background: transparent;
+}
+
+.ingredients-table th {
+  background: var(--surface-color);
+  color: var(--text-primary);
+  font-weight: 600;
+  font-size: 0.9rem;
+  border-bottom: 2px solid var(--border-color);
+}
+
+.ingredients-table th mat-icon {
+  margin-right: 8px;
+  font-size: 1.1rem;
+  color: #FF9800;
+}
+
+.ingredient-row {
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.ingredient-row:hover {
+  background-color: var(--background-color);
+  transform: translateX(4px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.ingredient-name {
+  display: flex;
+  flex-direction: column;
+}
+
+.ingredient-name strong {
+  color: var(--text-primary);
+  font-size: 1rem;
+}
+
+.quantity-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.current-quantity {
+  font-weight: 600;
+  color: var(--text-primary);
+  font-size: 1rem;
+}
+
+.minimum-quantity {
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+}
+
+.unit-chip {
+  background: #E3F2FD !important;
+  color: #1976D2 !important;
+  font-weight: 500;
+  font-size: 0.8rem;
+}
+
+.provider-info {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+.status-container {
+  display: flex;
+  align-items: center;
+}
+
+.status-chip {
+  font-size: 0.8rem;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.status-chip.status-good {
+  background: #E8F5E8 !important;
+  color: #2E7D32 !important;
+}
+
+.status-chip.status-warning {
+  background: #FFF3E0 !important;
+  color: #F57C00 !important;
+}
+
+.status-chip.status-critical {
+  background: #FFEBEE !important;
+  color: #C62828 !important;
+}
+
+.status-icon {
+  font-size: 1rem !important;
+  width: 16px !important;
+  height: 16px !important;
+}
+
+.actions-container {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.actions-container button {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  transition: all 0.3s ease;
+}
+
+.actions-container button:hover {
+  transform: scale(1.1);
+}
+
+.view-btn {
+  color: #9C27B0 !important;
+}
+
+.edit-btn {
+  color: #2196F3 !important;
+}
+
+.delete-btn {
+  color: #f44336 !important;
+}
+
+.view-btn:hover {
+  background-color: rgba(156, 39, 176, 0.1) !important;
+}
+
+.edit-btn:hover {
+  background-color: rgba(33, 150, 243, 0.1) !important;
+}
+
+.delete-btn:hover {
+  background-color: rgba(244, 67, 54, 0.1) !important;
+}
+
+/* ========================================
+   MODAL
+   ======================================== */
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  backdrop-filter: blur(5px);
+}
+
+.modal-container {
+  background: white;
+  border-radius: 16px;
+  width: 90%;
+  max-width: 600px;
+  max-height: 90vh;
+  overflow: hidden;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+  animation: modalSlideIn 0.3s ease-out;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 24px;
+  background: linear-gradient(135deg, #FF9800, #FF8A65);
+  color: white;
+}
+
+.modal-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.modal-icon {
+  font-size: 1.5rem;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-icon.create {
+  background: rgba(76, 175, 80, 0.2);
+  color: #4CAF50;
+}
+
+.modal-icon.edit {
+  background: rgba(33, 150, 243, 0.2);
+  color: #2196F3;
+}
+
+.modal-icon.view {
+  background: rgba(156, 39, 176, 0.2);
+  color: #9C27B0;
+}
+
+.modal-title h2 {
+  margin: 0;
+  font-size: 1.4rem;
+  font-weight: 500;
+}
+
+.close-btn {
+  color: white;
+  width: 40px;
+  height: 40px;
+}
+
+.modal-content {
+  padding: 24px;
+  max-height: 60vh;
+  overflow-y: auto;
+}
+
+.form-field {
+  width: 100%;
+  margin-bottom: 16px;
+}
+
+.form-row {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+}
+
+.half-width {
+  flex: 1;
+}
+
+.view-info {
+  margin-top: 24px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border-color);
+}
+
+.info-section h4 {
+  margin: 0 0 12px 0;
+  color: var(--text-primary);
+  font-size: 1rem;
+}
+
+.info-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.info-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  padding: 8px;
+  background: var(--background-color);
+  border-radius: 8px;
+}
+
+.info-item mat-icon {
+  color: #FF9800;
+  font-size: 1.1rem;
+}
+
+.modal-footer {
+  padding: 16px 24px;
+  background: var(--surface-color);
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  border-top: 1px solid var(--border-color);
+}
+
+.cancel-btn {
+  color: var(--text-secondary);
+}
+
+.submit-btn {
+  border-radius: 8px;
+  font-weight: 500;
+  background: #FF9800 !important;
+  color: white !important;
+}
+
+.button-content,
+.button-loading {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* ========================================
+   ESTADOS ESPECIALES
+   ======================================== */
+
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 24px;
+  gap: 16px;
+}
+
+.loading-text {
+  color: var(--text-secondary);
+  font-size: 1rem;
+  margin: 0;
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 64px 24px;
+  text-align: center;
+  color: var(--text-secondary);
+}
+
+.empty-state mat-icon {
+  font-size: 64px;
+  width: 64px;
+  height: 64px;
+  margin-bottom: 24px;
+  opacity: 0.5;
+  color: var(--text-light);
+}
+
+.empty-state h3 {
+  font-size: 1.5rem;
+  margin: 0 0 8px 0;
+  color: var(--text-primary);
+}
+
+.empty-state p {
+  font-size: 1rem;
+  margin: 0 0 24px 0;
+  line-height: 1.5;
+}
+
+.table-paginator {
+  border-top: 1px solid var(--border-color);
+  margin-top: 16px;
+  background: var(--surface-color);
+}
+
+/* ========================================
+   OVERRIDE MATERIAL DESIGN COLORS
+   ======================================== */
+
+::ng-deep .mat-mdc-form-field {
+  background-color: white !important;
+}
+
+::ng-deep .mat-mdc-text-field-wrapper {
+  background-color: white !important;
+}
+
+::ng-deep .mat-mdc-form-field-flex {
+  background-color: white !important;
+}
+
+::ng-deep .mat-mdc-form-field-outline {
+  color: var(--border-color) !important;
+}
+
+::ng-deep .mat-mdc-form-field.mat-focused .mat-mdc-form-field-outline {
+  color: #FF9800 !important;
+}
+
+::ng-deep .mat-mdc-form-field input {
+  color: var(--text-primary) !important;
+  background-color: white !important;
+}
+
+::ng-deep .mat-mdc-form-field-label {
+  color: var(--text-secondary) !important;
+}
+
+::ng-deep .mat-mdc-form-field .mat-mdc-form-field-icon-suffix {
+  color: var(--text-secondary) !important;
+}
+
+::ng-deep .mat-mdc-card {
+  background-color: white !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08) !important;
+}
+
+::ng-deep .mat-mdc-button:not([color]) {
+  color: var(--text-primary) !important;
+}
+
+::ng-deep .mat-mdc-icon-button:not([color]) {
+  color: var(--text-secondary) !important;
+}
+
+::ng-deep .mat-mdc-header-cell {
+  background-color: white !important;
+  color: var(--text-primary) !important;
+}
+
+::ng-deep .mat-mdc-paginator {
+  background-color: white !important;
+  color: var(--text-primary) !important;
+}
+
+/* ========================================
+   ANIMACIONES
+   ======================================== */
+
+@keyframes modalSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-50px) scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* ========================================
+   RESPONSIVE DESIGN
+   ======================================== */
+
+@media (max-width: 768px) {
+  .ingredients-container {
+    padding: 0;
+  }
+
+  .page-header {
+    padding: 24px 16px;
+  }
+
+  .header-content {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+
+  .header-text h1 {
+    font-size: 1.8rem;
+  }
+
+  .header-actions {
+    width: 100%;
+  }
+
+  .create-btn {
+    width: 100%;
+  }
+
+  .main-content {
+    padding: 0 16px;
+    gap: 16px;
+  }
+
+  .search-section {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+
+  .search-field {
+    max-width: none;
+  }
+
+  .ingredients-table {
+    font-size: 0.9rem;
+  }
+
+  .ingredient-name strong {
+    font-size: 0.9rem;
+  }
+
+  .actions-container {
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .actions-container button {
+    width: 36px;
+    height: 36px;
+  }
+
+  .modal-container {
+    width: 95%;
+    margin: 16px;
+  }
+
+  .modal-header {
+    padding: 20px 16px;
+  }
+
+  .modal-title h2 {
+    font-size: 1.2rem;
+  }
+
+  .modal-content {
+    padding: 20px 16px;
+  }
+
+  .modal-footer {
+    padding: 16px;
+    flex-direction: column;
+  }
+
+  .modal-footer button {
+    width: 100%;
+  }
+
+  .form-row {
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .half-width {
+    width: 100%;
+  }
+
+  .info-grid {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .displayedColumns {
+    font-size: 0.8rem;
+  }
+
+  .quantity-info {
+    font-size: 0.85rem;
+  }
+
+  .provider-info {
+    font-size: 0.8rem;
+  }
+
+  .status-chip {
+    font-size: 0.7rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .modal-container {
+    width: 100%;
+    height: 100%;
+    border-radius: 0;
+    max-height: 100vh;
+  }
+
+  .header-text h1 {
+    font-size: 1.6rem;
+  }
+
+  .ingredients-table th {
+    padding: 8px 4px;
+    font-size: 0.8rem;
+  }
+
+  .ingredients-table td {
+    padding: 8px 4px;
+    font-size: 0.8rem;
+  }
+
+  .actions-container {
+    gap: 2px;
+  }
+
+  .actions-container button {
+    width: 32px;
+    height: 32px;
+  }
+}

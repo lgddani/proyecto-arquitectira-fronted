@@ -34,11 +34,11 @@ const routes: Routes = [
         data: { roles: ['Administrador'] }
       },
       
-      // {
-      //   path: 'ingredients',
-      //   loadChildren: () => import('./features/ingredients/ingredients.module').then(m => m.IngredientsModule),
-      //   data: { roles: ['Administrador'] }
-      // },
+      {
+        path: 'ingredients',
+        loadChildren: () => import('./features/ingredients/ingredients.module').then(m => m.IngredientsModule),
+        data: { roles: ['Administrador'] }
+      },
       
       // {
       //   path: 'recipes',
