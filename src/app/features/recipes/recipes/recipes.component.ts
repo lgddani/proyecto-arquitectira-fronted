@@ -391,4 +391,16 @@ export class RecipesComponent implements OnInit, OnDestroy {
     }
     return '';
   }
+
+  getAvailableIngredientsForField(currentIndex: number): IngredientWithProvider[] {
+  const selectedIngredientIds = this.getIngredientControls()
+    .map((control, index) => {
+      if (index === currentIndex) return null;
+      return control.get('ingredientID')?.value;
+    })
+    .filter(id => id !== null && id !== undefined && id !== '');
+  return this.availableIngredients.filter(ingredient => 
+    !selectedIngredientIds.includes(ingredient.ingredientID)
+  );
+}
 }

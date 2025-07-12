@@ -268,18 +268,17 @@
               <div class="ingredient-row">
                 <div class="ingredient-number">{{ i + 1 }}</div>
                 
-                <!-- Select de Ingrediente -->
                 <mat-form-field appearance="outline" class="ingredient-select">
-                  <mat-label>Ingrediente</mat-label>
-                  <mat-select formControlName="ingredientID" [disabled]="isViewMode()">
-                    <mat-option *ngFor="let availableIngredient of availableIngredients" 
-                               [value]="availableIngredient.ingredientID">
-                      {{ availableIngredient.ingredientName }}
-                      <span class="ingredient-unit">({{ availableIngredient.ingredientUnit }})</span>
-                    </mat-option>
-                  </mat-select>
-                  <mat-error>{{ getIngredientError(i, 'ingredientID') }}</mat-error>
-                </mat-form-field>
+                <mat-label>Ingrediente</mat-label>
+                <mat-select formControlName="ingredientID" [disabled]="isViewMode()">
+                  <mat-option *ngFor="let availableIngredient of getAvailableIngredientsForField(i)" 
+                            [value]="availableIngredient.ingredientID">
+                    {{ availableIngredient.ingredientName }}
+                    <span class="ingredient-unit">({{ availableIngredient.ingredientUnit }})</span>
+                  </mat-option>
+                </mat-select>
+                <mat-error>{{ getIngredientError(i, 'ingredientID') }}</mat-error>
+              </mat-form-field>
 
                 <!-- Cantidad Requerida -->
                 <mat-form-field appearance="outline" class="quantity-field">
