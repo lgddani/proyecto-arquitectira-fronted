@@ -1,0 +1,240 @@
+<div class="providers-container">
+  
+  <!-- Header -->
+  <div class="page-header">
+    <div class="header-content">
+      <div class="header-text">
+        <h1>Gestión de Proveedores</h1>
+        <p>Administra los proveedores de ingredientes para Diego's Wafles</p>
+      </div>
+      <div class="header-actions">
+        <button mat-raised-button (click)="openCreateModal()" class="create-btn">
+          <mat-icon>add</mat-icon>
+          Nuevo Proveedor
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Contenido principal -->
+  <div class="main-content">
+    
+    <!-- Barra de búsqueda -->
+    <mat-card class="search-card">
+      <mat-card-content>
+        <div class="search-section">
+          <mat-form-field appearance="outline" class="search-field">
+            <mat-label>Buscar proveedores</mat-label>
+            <input matInput 
+                   [(ngModel)]="searchValue"
+                   (keyup)="applyFilter($event)" 
+                   placeholder="Nombre o teléfono del proveedor">
+            <mat-icon matSuffix>search</mat-icon>
+          </mat-form-field>
+          
+          <button mat-button 
+                  *ngIf="searchValue" 
+                  (click)="clearFilter()" 
+                  class="clear-btn">
+            <mat-icon>clear</mat-icon>
+            Limpiar
+          </button>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Tabla de proveedores -->
+    <mat-card class="table-card">
+      <mat-card-header>
+        <mat-card-title>
+          <mat-icon>business</mat-icon>
+          Lista de Proveedores
+        </mat-card-title>
+        <mat-card-subtitle>
+          Total: {{ dataSource.data.length }} proveedor(es)
+        </mat-card-subtitle>
+      </mat-card-header>
+      
+      <mat-card-content>
+        
+        <!-- Loading -->
+        <div *ngIf="loading" class="loading-container">
+          <mat-spinner diameter="40"></mat-spinner>
+          <p class="loading-text">Cargando proveedores...</p>
+        </div>
+
+        <!-- Tabla -->
+        <div *ngIf="!loading" class="table-container">
+          
+          <!-- Sin datos -->
+          <div *ngIf="dataSource.data.length === 0" class="empty-state">
+            <mat-icon>business_center</mat-icon>
+            <h3>No hay proveedores registrados</h3>
+            <p>Comienza agregando tu primer proveedor</p>
+            <button mat-raised-button color="primary" (click)="openCreateModal()">
+              <mat-icon>add</mat-icon>
+              Agregar Proveedor
+            </button>
+          </div>
+
+          <!-- Tabla con datos -->
+          <table mat-table 
+                 [dataSource]="dataSource" 
+                 matSort 
+                 *ngIf="dataSource.data.length > 0"
+                 class="providers-table">
+
+            <!-- Columna Nombre -->
+            <ng-container matColumnDef="providerName">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>
+                <mat-icon>person</mat-icon>
+                Nombre del Proveedor
+              </th>
+              <td mat-cell *matCellDef="let provider">
+                <div class="provider-name">
+                  <strong>{{ provider.providerName }}</strong>
+                </div>
+              </td>
+            </ng-container>
+
+            <!-- Columna Teléfono -->
+            <ng-container matColumnDef="providerPhone">
+              <th mat-header-cell *matHeaderCellDef>
+                <mat-icon>phone</mat-icon>
+                Teléfono
+              </th>
+              <td mat-cell *matCellDef="let provider">
+                <div class="provider-phone">
+                  <mat-icon class="phone-icon">phone</mat-icon>
+                  {{ provider.providerPhone || 'No especificado' }}
+                </div>
+              </td>
+            </ng-container>
+
+            <!-- Columna Acciones -->
+            <ng-container matColumnDef="actions">
+              <th mat-header-cell *matHeaderCellDef>Acciones</th>
+              <td mat-cell *matCellDef="let provider">
+                <div class="actions-container">
+                  <button mat-icon-button 
+                          color="accent"
+                          (click)="openViewModal(provider)"
+                          matTooltip="Ver detalles">
+                    <mat-icon>visibility</mat-icon>
+                  </button>
+                  
+                  <button mat-icon-button 
+                          (click)="openEditModal(provider)"
+                          matTooltip="Editar proveedor">
+                    <mat-icon>edit</mat-icon>
+                  </button>
+                  
+                  <button mat-icon-button 
+                          color="warn"
+                          (click)="deleteProvider(provider)"
+                          matTooltip="Eliminar proveedor">
+                    <mat-icon>delete</mat-icon>
+                  </button>
+                </div>
+              </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;" 
+                class="provider-row"></tr>
+            
+          </table>
+
+          <!-- Paginador -->
+          <mat-paginator 
+            *ngIf="dataSource.data.length > 0"
+            [pageSizeOptions]="[5, 10, 25, 50]"
+            showFirstLastButtons
+            class="table-paginator">
+          </mat-paginator>
+          
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+  </div>
+</div>
+
+<!-- Modal para CRUD de proveedores -->
+<div class="modal-overlay" *ngIf="showModal" (click)="closeModal()">
+  <div class="modal-container" (click)="$event.stopPropagation()">
+    
+    <!-- Header del modal -->
+    <div class="modal-header">
+      <div class="modal-title">
+        <mat-icon [class]="'modal-icon ' + modalData.mode">{{ getModalIcon() }}</mat-icon>
+        <h2>{{ getModalTitle() }}</h2>
+      </div>
+      <button mat-icon-button (click)="closeModal()" class="close-btn">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+
+    <!-- Contenido del modal -->
+    <div class="modal-content">
+      <form [formGroup]="providerForm" (ngSubmit)="onSubmit()">
+        
+        <!-- Campo Nombre -->
+        <mat-form-field appearance="outline" class="form-field">
+          <mat-label>Nombre del Proveedor</mat-label>
+          <input matInput 
+                 formControlName="providerName"
+                 placeholder="Ingresa el nombre del proveedor"
+                 [readonly]="isViewMode()">
+          <mat-icon matSuffix>person</mat-icon>
+          <mat-error>{{ getProviderNameError() }}</mat-error>
+        </mat-form-field>
+
+        <!-- Campo Teléfono -->
+        <mat-form-field appearance="outline" class="form-field">
+          <mat-label>Teléfono</mat-label>
+          <input matInput 
+                 formControlName="providerPhone"
+                 placeholder="Ingresa el teléfono del proveedor"
+                 [readonly]="isViewMode()">
+          <mat-icon matSuffix>phone</mat-icon>
+          <mat-error>{{ getProviderPhoneError() }}</mat-error>
+        </mat-form-field>
+
+        <!-- Información adicional en modo ver -->
+        <div *ngIf="isViewMode() && modalData.provider" class="view-info">
+          <div class="info-item">
+            <mat-icon>badge</mat-icon>
+            <span>ID: {{ modalData.provider.providerID }}</span>
+          </div>
+        </div>
+
+      </form>
+    </div>
+
+    <!-- Footer del modal -->
+    <div class="modal-footer">
+      <button mat-button (click)="closeModal()" class="cancel-btn">
+        {{ isViewMode() ? 'Cerrar' : 'Cancelar' }}
+      </button>
+      
+      <button mat-raised-button 
+              (click)="onSubmit()"
+              [disabled]="modalLoading || isViewMode()"
+              *ngIf="!isViewMode()"
+              class="submit-btn">
+        
+        <div *ngIf="!modalLoading" class="button-content">
+          <mat-icon>{{ modalData.mode === 'create' ? 'add' : 'save' }}</mat-icon>
+          {{ modalData.mode === 'create' ? 'Registrar' : 'Actualizar' }}
+        </div>
+        
+        <div *ngIf="modalLoading" class="button-loading">
+          <mat-spinner diameter="20"></mat-spinner>
+          {{ modalData.mode === 'create' ? 'Registrando...' : 'Actualizando...' }}
+        </div>
+      </button>
+    </div>
+
+  </div>
+</div>

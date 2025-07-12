@@ -283,3 +283,36 @@ body {
 .pulse {
   animation: pulse 2s infinite;
 }
+
+/* ========================================
+   MATERIAL DESIGN OVERRIDES GLOBALES
+   ======================================== */
+
+/* Form fields siempre blancos */
+.mat-mdc-form-field {
+  background-color: white !important;
+}
+
+.mat-mdc-text-field-wrapper {
+  background-color: white !important;
+}
+
+/* Outline neutral */
+.mat-mdc-form-field-outline {
+  color: var(--border-color) !important;
+}
+
+.mat-mdc-form-field.mat-focused .mat-mdc-form-field-outline {
+  color: var(--primary-color) !important;
+}
+
+/* Cards neutras */
+.mat-mdc-card {
+  background-color: white !important;
+}
+
+/* Botones sin color por defecto */
+.mat-mdc-button:not([color]),
+.mat-mdc-icon-button:not([color]) {
+  color: var(--text-primary) !important;
+}
