@@ -1,116 +1,373 @@
-<div class="dashboard-container">
+<div class="dashboard-container" [class.loading]="loading">
   
+  <!-- Loading overlay -->
+  <div *ngIf="loading" class="loading-overlay">
+    <mat-spinner diameter="60"></mat-spinner>
+    <p class="loading-text">Cargando dashboard...</p>
+  </div>
+
   <!-- Header de bienvenida -->
   <div class="welcome-section">
     <div class="welcome-content">
-      <h1>{{ getGreeting() }}, {{ currentUser?.userName }}! 🧇</h1>
-      <p>Bienvenido al sistema de gestión de Diego's Wafles</p>
-      <div class="user-info">
-        <span class="role-badge">{{ getUserRole() }}</span>
-        <span class="time">{{ currentTime | date:'medium' }}</span>
+      <div class="greeting-row">
+        <div class="greeting-text">
+          <h1>{{ getPersonalizedGreeting() }}</h1>
+          <p class="welcome-subtitle">Panel de control - Diego's Wafles</p>
+          <div class="user-info">
+            <span class="role-badge" [class]="getUserRole().toLowerCase()">{{ getUserRole() }}</span>
+            <span class="time">
+              <mat-icon>schedule</mat-icon>
+              {{ currentTime | date:'medium':'es-ES' }}
+            </span>
+          </div>
+        </div>
+        <div class="welcome-actions">
+          <button mat-raised-button (click)="refreshDashboard()" class="refresh-btn">
+            <mat-icon>refresh</mat-icon>
+            Actualizar
+          </button>
+          <button mat-raised-button color="accent" (click)="createNewOrder()" 
+                  *ngIf="isAdmin() || isSeller()" class="new-order-btn">
+            <mat-icon>add_shopping_cart</mat-icon>
+            Nueva Orden
+          </button>
+        </div>
       </div>
     </div>
   </div>
 
-  <!-- Cards de estadísticas -->
-  <div class="stats-grid">
+  <!-- Grid principal del dashboard -->
+  <div class="dashboard-grid">
     
-    <mat-card class="stat-card orders">
-      <mat-card-content>
-        <div class="stat-content">
-          <div class="stat-icon">
+    <!-- Sección de estadísticas principales -->
+    <div class="stats-section">
+      <h2 class="section-title">
+        <mat-icon>analytics</mat-icon>
+        Estadísticas de Hoy
+      </h2>
+      
+      <div class="stats-grid">
+        
+        <!-- Órdenes de hoy -->
+        <mat-card class="stat-card orders-card">
+          <mat-card-content>
+            <div class="stat-content">
+              <div class="stat-icon">
+                <mat-icon>receipt_long</mat-icon>
+              </div>
+              <div class="stat-info">
+                <h3>{{ stats.ordersToday }}</h3>
+                <p>Órdenes Hoy</p>
+                <div class="stat-growth" [class.positive]="getOrdersGrowth().isPositive" [class.negative]="!getOrdersGrowth().isPositive">
+                  <mat-icon>{{ getOrdersGrowth().isPositive ? 'trending_up' : 'trending_down' }}</mat-icon>
+                  <span>{{ getOrdersGrowth().percentage }}%</span>
+                </div>
+              </div>
+            </div>
+          </mat-card-content>
+        </mat-card>
+
+        <!-- Ingresos de hoy -->
+        <mat-card class="stat-card revenue-card">
+          <mat-card-content>
+            <div class="stat-content">
+              <div class="stat-icon">
+                <mat-icon>attach_money</mat-icon>
+              </div>
+              <div class="stat-info">
+                <h3>{{ formatCurrency(stats.revenueToday) }}</h3>
+                <p>Ingresos Hoy</p>
+                <div class="stat-growth" [class.positive]="getRevenueGrowth().isPositive" [class.negative]="!getRevenueGrowth().isPositive">
+                  <mat-icon>{{ getRevenueGrowth().isPositive ? 'trending_up' : 'trending_down' }}</mat-icon>
+                  <span>{{ getRevenueGrowth().percentage }}%</span>
+                </div>
+              </div>
+            </div>
+          </mat-card-content>
+        </mat-card>
+
+        <!-- Alertas de stock -->
+        <mat-card class="stat-card stock-card" [class.alert]="stats.lowStockItems > 0">
+          <mat-card-content>
+            <div class="stat-content">
+              <div class="stat-icon">
+                <mat-icon [matBadge]="stats.lowStockItems > 0 ? stats.lowStockItems : null" 
+                          matBadgeColor="warn">warning</mat-icon>
+              </div>
+              <div class="stat-info">
+                <h3>{{ stats.lowStockItems }}</h3>
+                <p>Stock Bajo</p>
+                <button mat-button color="warn" (click)="viewLowStockDetails()" 
+                        *ngIf="stats.lowStockItems > 0" class="alert-button">
+                  Ver Detalles
+                </button>
+              </div>
+            </div>
+          </mat-card-content>
+        </mat-card>
+
+        <!-- Total de productos -->
+        <mat-card class="stat-card products-card">
+          <mat-card-content>
+            <div class="stat-content">
+              <div class="stat-icon">
+                <mat-icon>fastfood</mat-icon>
+              </div>
+              <div class="stat-info">
+                <h3>{{ stats.totalProducts }}</h3>
+                <p>Productos</p>
+                <small>{{ stats.totalIngredients }} ingredientes</small>
+              </div>
+            </div>
+          </mat-card-content>
+        </mat-card>
+
+      </div>
+    </div>
+
+    <!-- Sección de órdenes recientes -->
+    <div class="recent-orders-section">
+      <div class="section-header">
+        <h2 class="section-title">
+          <mat-icon>history</mat-icon>
+          Órdenes Recientes
+        </h2>
+        <button mat-button (click)="viewAllOrders()">
+          Ver Todas
+          <mat-icon>arrow_forward</mat-icon>
+        </button>
+      </div>
+
+      <mat-card class="recent-orders-card">
+        <mat-card-content>
+          <div *ngIf="recentOrders.length === 0" class="empty-state">
             <mat-icon>receipt_long</mat-icon>
+            <p>No hay órdenes recientes</p>
+            <button mat-raised-button  (click)="createNewOrder()" 
+                    *ngIf="isAdmin() || isSeller()">
+              Crear Primera Orden
+            </button>
           </div>
-          <div class="stat-info">
-            <h3>{{ stats.ordersToday }}</h3>
-            <p>Órdenes Hoy</p>
-          </div>
-        </div>
-      </mat-card-content>
-    </mat-card>
 
-    <mat-card class="stat-card stock">
-      <mat-card-content>
-        <div class="stat-content">
-          <div class="stat-icon">
-            <mat-icon>warning</mat-icon>
+          <div *ngIf="recentOrders.length > 0" class="orders-list">
+            <div *ngFor="let order of recentOrders" class="order-item">
+              <div class="order-header">
+                <span class="order-id">#{{ order.orderID }}</span>
+                <span class="order-date">{{ formatDate(order.createdAt) }}</span>
+                <span class="order-total">{{ formatCurrency(order.total) }}</span>
+              </div>
+              <div class="order-details">
+                <div class="order-products">
+                  <span *ngFor="let product of order.products; let last = last">
+                    {{ product.quantity }}x {{ product.productName }}<span *ngIf="!last">, </span>
+                  </span>
+                </div>
+                <p class="order-comment" *ngIf="order.comment && order.comment !== 'Sin comentarios'">
+                  "{{ order.comment }}"
+                </p>
+              </div>
+            </div>
           </div>
-          <div class="stat-info">
-            <h3>{{ stats.lowStockItems }}</h3>
-            <p>Stock Bajo</p>
-          </div>
-        </div>
-      </mat-card-content>
-    </mat-card>
+        </mat-card-content>
+      </mat-card>
+    </div>
 
-    <mat-card class="stat-card products">
-      <mat-card-content>
-        <div class="stat-content">
-          <div class="stat-icon">
-            <mat-icon>fastfood</mat-icon>
-          </div>
-          <div class="stat-info">
-            <h3>{{ stats.totalProducts }}</h3>
-            <p>Productos</p>
-          </div>
-        </div>
-      </mat-card-content>
-    </mat-card>
+    <!-- Sección de alertas de stock -->
+    <div class="alerts-section" *ngIf="lowStockAlerts.length > 0">
+      <div class="section-header">
+        <h2 class="section-title">
+          <mat-icon>warning</mat-icon>
+          Alertas de Inventario
+        </h2>
+        <button mat-button color="warn" (click)="manageInventory()">
+          Gestionar
+          <mat-icon>arrow_forward</mat-icon>
+        </button>
+      </div>
 
-    <mat-card class="stat-card revenue">
-      <mat-card-content>
-        <div class="stat-content">
-          <div class="stat-icon">
-            <mat-icon>attach_money</mat-icon>
+      <mat-card class="alerts-card">
+        <mat-card-content>
+          <div class="alerts-list">
+            <div *ngFor="let alert of lowStockAlerts; let i = index" 
+                 class="alert-item" 
+                 [class]="getAlertClass(alert.urgencyLevel)"
+                 [style.border-left-color]="alertColors[alert.urgencyLevel]">
+              
+              <div class="alert-icon">
+                <mat-icon [style.color]="alertColors[alert.urgencyLevel]">
+                  {{ alert.urgencyLevel === 'high' ? 'error' : 
+                     alert.urgencyLevel === 'medium' ? 'warning' : 'info' }}
+                </mat-icon>
+              </div>
+              
+              <div class="alert-content">
+                <h4>{{ alert.ingredientName }}</h4>
+                <p>
+                  Stock actual: <strong>{{ alert.currentQuantity }} {{ alert.unit }}</strong> / 
+                  Mínimo: {{ alert.minimumQuantity }} {{ alert.unit }}
+                </p>
+                <div class="alert-progress">
+                  <mat-progress-bar 
+                    mode="determinate" 
+                    [value]="getStockPercentage(alert.currentQuantity, alert.minimumQuantity)"
+                    [color]="alert.urgencyLevel === 'high' ? 'warn' : 'primary'">
+                  </mat-progress-bar>
+                  <span class="progress-text">
+                    {{ getStockPercentage(alert.currentQuantity, alert.minimumQuantity) | number:'1.0-0' }}%
+                  </span>
+                </div>
+              </div>
+              
+              <div class="alert-actions">
+                <button mat-icon-button (click)="manageInventory()" matTooltip="Gestionar inventario">
+                  <mat-icon>edit</mat-icon>
+                </button>
+              </div>
+            </div>
           </div>
-          <div class="stat-info">
-            <h3>${{ stats.totalRevenue }}</h3>
-            <p>Ingresos Hoy</p>
+        </mat-card-content>
+      </mat-card>
+    </div>
+
+    <!-- Sección de productos más vendidos -->
+    <div class="top-products-section" *ngIf="topProducts.length > 0">
+      <h2 class="section-title">
+        <mat-icon>star</mat-icon>
+        Productos Más Vendidos
+      </h2>
+
+      <mat-card class="top-products-card">
+        <mat-card-content>
+          <div class="products-list">
+            <div *ngFor="let product of topProducts; let i = index" class="product-item">
+              <div class="product-rank">{{ i + 1 }}</div>
+              <div class="product-info">
+                <h4>{{ product.name }}</h4>
+                <p>{{ product.sales }} unidades vendidas</p>
+              </div>
+              <div class="product-revenue">
+                {{ formatCurrency(product.revenue) }}
+              </div>
+            </div>
           </div>
-        </div>
-      </mat-card-content>
-    </mat-card>
+        </mat-card-content>
+      </mat-card>
+    </div>
+
+    <!-- Acciones rápidas -->
+    <div class="quick-actions-section">
+      <h2 class="section-title">
+        <mat-icon>flash_on</mat-icon>
+        Acciones Rápidas
+      </h2>
+      
+      <div class="actions-grid">
+        
+        <mat-card class="action-card new-order" (click)="navigateTo('/orders/new')" 
+                  *ngIf="isAdmin() || isSeller()">
+          <mat-card-content>
+            <div class="action-content">
+              <mat-icon>add_shopping_cart</mat-icon>
+              <h3>Nueva Orden</h3>
+              <p>Crear una nueva orden de venta</p>
+            </div>
+          </mat-card-content>
+        </mat-card>
+
+        <mat-card class="action-card inventory" (click)="navigateTo('/ingredients')" 
+                  *ngIf="isAdmin()">
+          <mat-card-content>
+            <div class="action-content">
+              <mat-icon>inventory_2</mat-icon>
+              <h3>Inventario</h3>
+              <p>Gestionar ingredientes y stock</p>
+            </div>
+          </mat-card-content>
+        </mat-card>
+
+        <mat-card class="action-card products" (click)="navigateTo('/products')" 
+                  *ngIf="isAdmin()">
+          <mat-card-content>
+            <div class="action-content">
+              <mat-icon>restaurant_menu</mat-icon>
+              <h3>Productos</h3>
+              <p>Administrar productos y recetas</p>
+            </div>
+          </mat-card-content>
+        </mat-card>
+
+        <mat-card class="action-card users" (click)="navigateTo('/users')" 
+                  *ngIf="isAdmin()">
+          <mat-card-content>
+            <div class="action-content">
+              <mat-icon>people</mat-icon>
+              <h3>Usuarios</h3>
+              <p>Gestionar usuarios del sistema</p>
+            </div>
+          </mat-card-content>
+        </mat-card>
+
+        <mat-card class="action-card reports" (click)="navigateTo('/reports')" 
+                  *ngIf="isAdmin()">
+          <mat-card-content>
+            <div class="action-content">
+              <mat-icon>assessment</mat-icon>
+              <h3>Reportes</h3>
+              <p>Ver estadísticas y reportes</p>
+            </div>
+          </mat-card-content>
+        </mat-card>
+
+        <mat-card class="action-card providers" (click)="navigateTo('/providers')" 
+                  *ngIf="isAdmin()">
+          <mat-card-content>
+            <div class="action-content">
+              <mat-icon>business</mat-icon>
+              <h3>Proveedores</h3>
+              <p>Gestionar proveedores</p>
+            </div>
+          </mat-card-content>
+        </mat-card>
+
+      </div>
+    </div>
 
   </div>
 
-  <!-- Acciones rápidas -->
-  <div class="quick-actions">
-    <h2>Acciones Rápidas</h2>
-    <div class="actions-grid">
-      
-      <mat-card class="action-card" routerLink="/orders" *ngIf="getUserRole() === 'Administrador' || getUserRole() === 'Vendedor'">
-        <mat-card-content>
-          <mat-icon>add_shopping_cart</mat-icon>
-          <h3>Nueva Orden</h3>
-          <p>Crear una nueva orden de venta</p>
-        </mat-card-content>
-      </mat-card>
-
-      <mat-card class="action-card" routerLink="/ingredients" *ngIf="getUserRole() === 'Administrador'">
-        <mat-card-content>
-          <mat-icon>inventory_2</mat-icon>
-          <h3>Gestionar Inventario</h3>
-          <p>Administrar ingredientes y stock</p>
-        </mat-card-content>
-      </mat-card>
-
-      <mat-card class="action-card" routerLink="/products" *ngIf="getUserRole() === 'Administrador'">
-        <mat-card-content>
-          <mat-icon>restaurant_menu</mat-icon>
-          <h3>Gestionar Productos</h3>
-          <p>Administrar productos y recetas</p>
-        </mat-card-content>
-      </mat-card>
-
-      <mat-card class="action-card" routerLink="/users" *ngIf="getUserRole() === 'Administrador'">
-        <mat-card-content>
-          <mat-icon>people</mat-icon>
-          <h3>Gestionar Usuarios</h3>
-          <p>Administrar usuarios del sistema</p>
-        </mat-card-content>
-      </mat-card>
-
-    </div>
+  <!-- Resumen del mes (sección adicional) -->
+  <div class="monthly-summary" *ngIf="!loading">
+    <mat-card class="summary-card">
+      <mat-card-header>
+        <mat-card-title>
+          <mat-icon>calendar_month</mat-icon>
+          Resumen del Mes
+        </mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="summary-grid">
+          <div class="summary-item">
+            <span class="summary-label">Órdenes</span>
+            <span class="summary-value">{{ stats.ordersThisMonth }}</span>
+          </div>
+          <div class="summary-item">
+            <span class="summary-label">Ingresos</span>
+            <span class="summary-value">{{ formatCurrency(stats.totalRevenue) }}</span>
+          </div>
+          <div class="summary-item">
+            <span class="summary-label">Promedio/Orden</span>
+            <span class="summary-value">
+              {{ formatCurrency(stats.ordersThisMonth > 0 ? stats.totalRevenue / stats.ordersThisMonth : 0) }}
+            </span>
+          </div>
+          <div class="summary-item">
+            <span class="summary-label">Estado Inventario</span>
+            <span class="summary-value" [class.warn]="stats.lowStockItems > 0">
+              {{ stats.lowStockItems === 0 ? 'Óptimo' : 'Atención Requerida' }}
+            </span>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
   </div>
 
 </div>

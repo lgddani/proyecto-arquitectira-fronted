@@ -36,6 +36,7 @@ import { AppRoutingModule } from './app-routing.module';
 
 // Layout Module
 import { LayoutModule } from './layout/layout.module';
+import { AuthInterceptor } from './core/interceptors/auth.interceptor';
 
 @NgModule({
   declarations: [
@@ -85,7 +86,11 @@ import { LayoutModule } from './layout/layout.module';
     })
   ],
   providers: [
-    // Por ahora sin interceptors, los agregaremos después
+    {
+    provide: HTTP_INTERCEPTORS,
+    useClass: AuthInterceptor,
+    multi: true
+  }
   ],
   bootstrap: [AppComponent]
 })

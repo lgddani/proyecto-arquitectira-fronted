@@ -7,9 +7,18 @@ import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatGridListModule } from '@angular/material/grid-list';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { MatBadgeModule } from '@angular/material/badge';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatChipsModule } from '@angular/material/chips';
+import { MatDividerModule } from '@angular/material/divider';
 
 // Components
 import { DashboardComponent } from './dashboard/dashboard.component';
+
+// Services
+import { DashboardService } from '../../core/services/dashboard.service';
 
 const routes: Routes = [
   { 
@@ -30,7 +39,16 @@ const routes: Routes = [
     MatCardModule,
     MatIconModule,
     MatButtonModule,
-    MatGridListModule
+    MatGridListModule,
+    MatProgressSpinnerModule,
+    MatProgressBarModule,
+    MatBadgeModule,
+    MatTooltipModule,
+    MatChipsModule,
+    MatDividerModule
+  ],
+  providers: [
+    DashboardService
   ]
 })
 export class DashboardModule { }
