@@ -1,0 +1,107 @@
+<div class="login-container">
+  
+  <!-- Header del formulario -->
+  <div class="login-header">
+    <h2>Iniciar Sesión</h2>
+    <p>Ingresa a tu cuenta de Diego's Wafles</p>
+  </div>
+
+  <!-- Formulario -->
+  <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="login-form">
+    
+    <!-- Campo Email -->
+    <mat-form-field appearance="outline" class="form-field">
+      <mat-label>Correo Electrónico</mat-label>
+      <input 
+        matInput 
+        type="email"
+        formControlName="email"
+        placeholder="usuario@diegoswafles.com"
+        autocomplete="email">
+      <mat-icon matSuffix>email</mat-icon>
+      <mat-error>{{ getEmailError() }}</mat-error>
+    </mat-form-field>
+
+    <!-- Campo Contraseña -->
+    <mat-form-field appearance="outline" class="form-field">
+      <mat-label>Contraseña</mat-label>
+      <input 
+        matInput 
+        [type]="hidePassword ? 'password' : 'text'"
+        formControlName="password"
+        placeholder="Ingresa tu contraseña"
+        autocomplete="current-password">
+      <button 
+        mat-icon-button 
+        matSuffix 
+        type="button"
+        (click)="togglePasswordVisibility()"
+        [attr.aria-label]="'Mostrar contraseña'"
+        [attr.aria-pressed]="!hidePassword">
+        <mat-icon>{{ hidePassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+      </button>
+      <mat-error>{{ getPasswordError() }}</mat-error>
+    </mat-form-field>
+
+    <!-- Recordar usuario -->
+    <div class="form-options">
+      <mat-checkbox 
+        [checked]="rememberMe"
+        (change)="rememberMe = $event.checked"
+        color="primary">
+        Recordar mi usuario
+      </mat-checkbox>
+      
+      <button 
+        type="button" 
+        mat-button 
+        color="primary"
+        class="forgot-password"
+        (click)="onForgotPassword()">
+        ¿Olvidaste tu contraseña?
+      </button>
+    </div>
+
+    <!-- Botón de login -->
+    <button 
+      mat-raised-button 
+      color="primary"
+      type="submit"
+      class="login-button"
+      [disabled]="loading">
+      
+      <span *ngIf="!loading">Iniciar Sesión</span>
+      
+      <span *ngIf="loading" class="loading-content">
+        <mat-spinner diameter="20"></mat-spinner>
+        <span class="loading-text">Iniciando sesión...</span>
+      </span>
+    </button>
+
+  </form>
+
+  <!-- Divider -->
+  <mat-divider class="divider"></mat-divider>
+
+  <!-- Demo/Testing (eliminar en producción) -->
+  <div class="demo-section">
+    <p class="demo-text">Para pruebas:</p>
+    <button 
+      mat-stroked-button 
+      color="accent"
+      type="button"
+      class="demo-button"
+      (click)="fillDemoCredentials()">
+      🧇 Llenar credenciales demo
+    </button>
+  </div>
+
+  <!-- Footer del login -->
+  <div class="login-footer">
+    <p>
+      <mat-icon class="info-icon">info</mat-icon>
+      Sistema de gestión interno para empleados autorizados
+    </p>
+  </div>
+
+</div>

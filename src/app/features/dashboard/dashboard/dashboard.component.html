@@ -1,0 +1,116 @@
+<div class="dashboard-container">
+  
+  <!-- Header de bienvenida -->
+  <div class="welcome-section">
+    <div class="welcome-content">
+      <h1>{{ getGreeting() }}, {{ currentUser?.userName }}! 🧇</h1>
+      <p>Bienvenido al sistema de gestión de Diego's Wafles</p>
+      <div class="user-info">
+        <span class="role-badge">{{ getUserRole() }}</span>
+        <span class="time">{{ currentTime | date:'medium' }}</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Cards de estadísticas -->
+  <div class="stats-grid">
+    
+    <mat-card class="stat-card orders">
+      <mat-card-content>
+        <div class="stat-content">
+          <div class="stat-icon">
+            <mat-icon>receipt_long</mat-icon>
+          </div>
+          <div class="stat-info">
+            <h3>{{ stats.ordersToday }}</h3>
+            <p>Órdenes Hoy</p>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="stat-card stock">
+      <mat-card-content>
+        <div class="stat-content">
+          <div class="stat-icon">
+            <mat-icon>warning</mat-icon>
+          </div>
+          <div class="stat-info">
+            <h3>{{ stats.lowStockItems }}</h3>
+            <p>Stock Bajo</p>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="stat-card products">
+      <mat-card-content>
+        <div class="stat-content">
+          <div class="stat-icon">
+            <mat-icon>fastfood</mat-icon>
+          </div>
+          <div class="stat-info">
+            <h3>{{ stats.totalProducts }}</h3>
+            <p>Productos</p>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="stat-card revenue">
+      <mat-card-content>
+        <div class="stat-content">
+          <div class="stat-icon">
+            <mat-icon>attach_money</mat-icon>
+          </div>
+          <div class="stat-info">
+            <h3>${{ stats.totalRevenue }}</h3>
+            <p>Ingresos Hoy</p>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+  </div>
+
+  <!-- Acciones rápidas -->
+  <div class="quick-actions">
+    <h2>Acciones Rápidas</h2>
+    <div class="actions-grid">
+      
+      <mat-card class="action-card" routerLink="/orders" *ngIf="getUserRole() === 'Administrador' || getUserRole() === 'Vendedor'">
+        <mat-card-content>
+          <mat-icon>add_shopping_cart</mat-icon>
+          <h3>Nueva Orden</h3>
+          <p>Crear una nueva orden de venta</p>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="action-card" routerLink="/ingredients" *ngIf="getUserRole() === 'Administrador'">
+        <mat-card-content>
+          <mat-icon>inventory_2</mat-icon>
+          <h3>Gestionar Inventario</h3>
+          <p>Administrar ingredientes y stock</p>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="action-card" routerLink="/products" *ngIf="getUserRole() === 'Administrador'">
+        <mat-card-content>
+          <mat-icon>restaurant_menu</mat-icon>
+          <h3>Gestionar Productos</h3>
+          <p>Administrar productos y recetas</p>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="action-card" routerLink="/users" *ngIf="getUserRole() === 'Administrador'">
+        <mat-card-content>
+          <mat-icon>people</mat-icon>
+          <h3>Gestionar Usuarios</h3>
+          <p>Administrar usuarios del sistema</p>
+        </mat-card-content>
+      </mat-card>
+
+    </div>
+  </div>
+
+</div>

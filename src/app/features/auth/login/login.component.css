@@ -1,0 +1,246 @@
+.login-container {
+  width: 100%;
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+/* Header del formulario */
+.login-header {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.login-header h2 {
+  font-size: 1.75rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 8px 0;
+}
+
+.login-header p {
+  color: var(--text-secondary);
+  margin: 0;
+  font-size: 0.95rem;
+}
+
+/* Formulario */
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.form-field {
+  width: 100%;
+}
+
+.form-field .mat-mdc-form-field {
+  width: 100%;
+}
+
+/* Opciones del formulario */
+.form-options {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: -8px 0 8px 0;
+}
+
+.forgot-password {
+  font-size: 0.85rem !important;
+  padding: 4px 8px !important;
+  min-width: auto !important;
+  height: auto !important;
+}
+
+/* Botón de login */
+.login-button {
+  height: 48px;
+  font-size: 1rem;
+  font-weight: 600;
+  border-radius: 8px;
+  background: linear-gradient(45deg, var(--primary-color), var(--primary-light)) !important;
+  box-shadow: 0 4px 12px rgba(139, 69, 19, 0.3);
+  transition: all 0.3s ease;
+}
+
+.login-button:hover:not([disabled]) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(139, 69, 19, 0.4);
+}
+
+.login-button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.loading-content {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  justify-content: center;
+}
+
+.loading-text {
+  font-size: 0.9rem;
+}
+
+/* Divider */
+.divider {
+  margin: 24px 0;
+  background-color: var(--border-color);
+}
+
+/* Sección demo */
+.demo-section {
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.demo-text {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin: 0 0 12px 0;
+}
+
+.demo-button {
+  border-color: var(--secondary-color) !important;
+  color: var(--secondary-color) !important;
+  font-size: 0.85rem;
+  height: 36px;
+  border-radius: 18px;
+  transition: all 0.3s ease;
+}
+
+.demo-button:hover {
+  background: var(--secondary-color) !important;
+  color: white !important;
+  transform: scale(1.05);
+}
+
+/* Footer del login */
+.login-footer {
+  text-align: center;
+  margin-top: 16px;
+}
+
+.login-footer p {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-size: 0.8rem;
+  color: var(--text-light);
+  margin: 0;
+  line-height: 1.4;
+}
+
+.info-icon {
+  font-size: 1rem !important;
+  width: 16px !important;
+  height: 16px !important;
+  color: var(--info-color);
+}
+
+/* Personalización de Angular Material */
+::ng-deep .login-container {
+  
+  /* Form fields */
+  .mat-mdc-form-field-outline {
+    color: var(--border-color);
+  }
+  
+  .mat-mdc-form-field.mat-focused .mat-mdc-form-field-outline {
+    color: var(--primary-color);
+  }
+  
+  .mat-mdc-form-field-label {
+    color: var(--text-secondary);
+  }
+  
+  .mat-mdc-form-field.mat-focused .mat-mdc-form-field-label {
+    color: var(--primary-color);
+  }
+  
+  /* Checkbox */
+  .mat-mdc-checkbox.mat-primary {
+    --mdc-checkbox-selected-icon-color: var(--primary-color);
+    --mdc-checkbox-selected-hover-icon-color: var(--primary-color);
+    --mdc-checkbox-selected-pressed-icon-color: var(--primary-color);
+  }
+  
+  .mat-mdc-checkbox .mdc-form-field {
+    color: var(--text-primary);
+    font-size: 0.9rem;
+  }
+  
+  /* Error messages */
+  .mat-mdc-form-field-error {
+    font-size: 0.8rem;
+    color: var(--error-color);
+  }
+  
+  /* Input focus */
+  .mat-mdc-input-element:focus {
+    outline: none;
+  }
+  
+  /* Icons */
+  .mat-icon {
+    color: var(--text-secondary);
+  }
+  
+  .mat-mdc-form-field.mat-focused .mat-icon {
+    color: var(--primary-color);
+  }
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+  .form-options {
+    flex-direction: column;
+    gap: 12px;
+    align-items: flex-start;
+  }
+  
+  .login-header h2 {
+    font-size: 1.5rem;
+  }
+  
+  .demo-button {
+    width: 100%;
+  }
+}
+
+/* Estados de error para los campos */
+.form-field.ng-invalid.ng-touched .mat-mdc-form-field-outline {
+  color: var(--error-color) !important;
+}
+
+/* Animaciones */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.login-container {
+  animation: fadeIn 0.6s ease-out;
+}
+
+/* Efectos hover para mejorar UX */
+.form-field:hover .mat-mdc-form-field-outline {
+  color: var(--primary-light);
+  transition: color 0.3s ease;
+}
+
+.mat-mdc-checkbox:hover .mdc-checkbox {
+  transform: scale(1.1);
+  transition: transform 0.2s ease;
+}
