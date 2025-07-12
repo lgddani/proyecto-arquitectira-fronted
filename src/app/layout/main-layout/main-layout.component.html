@@ -1,0 +1,47 @@
+<div class="layout-container">
+  
+  <!-- Navbar Superior -->
+  <app-navbar 
+    (menuToggle)="toggleSidenav()"
+    [isHandset]="isHandset">
+  </app-navbar>
+
+  <!-- Contenedor Principal con Sidenav -->
+  <mat-sidenav-container class="sidenav-container">
+    
+    <!-- Sidebar -->
+    <mat-sidenav 
+      #drawer
+      class="sidenav"
+      [mode]="sidenavMode"
+      [opened]="sidenavOpened"
+      [fixedInViewport]="isHandset"
+      [fixedTopGap]="64">
+      
+      <app-sidebar (itemClick)="closeSidenavOnMobile()"></app-sidebar>
+      
+    </mat-sidenav>
+
+    <!-- Contenido Principal -->
+    <mat-sidenav-content class="main-content">
+      <div class="content-wrapper">
+        
+        <!-- Breadcrumb futuro -->
+        <div class="breadcrumb-container">
+          <!-- Aquí irán las breadcrumbs más tarde -->
+        </div>
+
+        <!-- Contenido de las páginas -->
+        <main class="page-content">
+          <router-outlet></router-outlet>
+        </main>
+
+        <!-- Footer -->
+        <app-footer></app-footer>
+        
+      </div>
+    </mat-sidenav-content>
+
+  </mat-sidenav-container>
+
+</div>

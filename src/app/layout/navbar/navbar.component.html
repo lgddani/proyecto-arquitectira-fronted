@@ -1,0 +1,97 @@
+<mat-toolbar class="navbar" color="primary">
+  
+  <!-- Botón de menú (solo mobile) -->
+  <button 
+    *ngIf="isHandset"
+    mat-icon-button 
+    (click)="onMenuToggle()"
+    class="menu-button"
+    matTooltip="Menú">
+    <mat-icon>menu</mat-icon>
+  </button>
+
+  <!-- Logo y título -->
+  <div class="logo-section">
+    <div class="logo-icon">🧇</div>
+    <div class="app-title">
+      <span class="title-main">Diego's</span>
+      <span class="title-sub">Wafles</span>
+    </div>
+  </div>
+
+  <!-- Spacer -->
+  <div class="spacer"></div>
+
+  <!-- Información del tiempo -->
+  <div class="time-info" *ngIf="!isHandset">
+    <mat-icon class="time-icon">schedule</mat-icon>
+    <span>{{ currentTime | date:'short' }}</span>
+  </div>
+
+  <!-- Notificaciones (futuro) -->
+  <button 
+    mat-icon-button 
+    class="notification-button"
+    matTooltip="Notificaciones">
+    <mat-icon matBadge="3" matBadgeColor="warn" matBadgeSize="small">notifications</mat-icon>
+  </button>
+
+  <!-- Menú de usuario -->
+  <button 
+    mat-button 
+    [matMenuTriggerFor]="userMenu"
+    class="user-button">
+    
+    <div class="user-avatar">
+      {{ getUserInitials() }}
+    </div>
+    
+    <div class="user-info" *ngIf="!isHandset">
+      <span class="user-name">{{ currentUser?.userName || 'Usuario' }}</span>
+      <span class="user-role">{{ getRoleDisplayName() }}</span>
+    </div>
+    
+    <mat-icon>arrow_drop_down</mat-icon>
+  </button>
+
+  <!-- Menú desplegable del usuario -->
+  <mat-menu #userMenu="matMenu" class="user-menu">
+    
+    <div class="user-menu-header">
+      <div class="user-avatar-large">
+        {{ getUserInitials() }}
+      </div>
+      <div class="user-details">
+        <div class="user-name">{{ currentUser?.userName }}</div>
+        <div class="user-email">{{ currentUser?.userEmail }}</div>
+        <div class="user-role-badge">{{ getRoleDisplayName() }}</div>
+      </div>
+    </div>
+
+    <mat-divider></mat-divider>
+
+    <button mat-menu-item routerLink="/profile">
+      <mat-icon>person</mat-icon>
+      <span>Mi Perfil</span>
+    </button>
+
+    <button mat-menu-item>
+      <mat-icon>settings</mat-icon>
+      <span>Configuración</span>
+    </button>
+
+    <button mat-menu-item>
+      <mat-icon>help</mat-icon>
+      <span>Ayuda</span>
+    </button>
+
+    <mat-divider></mat-divider>
+
+    <button mat-menu-item (click)="onLogout()" class="logout-item">
+      <mat-icon>exit_to_app</mat-icon>
+      <span>Cerrar Sesión</span>
+    </button>
+
+  </mat-menu>
+
+</mat-toolbar>

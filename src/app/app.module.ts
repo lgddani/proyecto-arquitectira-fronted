@@ -34,6 +34,9 @@ import { ToastrModule } from 'ngx-toastr';
 import { AppComponent } from './app.component';
 import { AppRoutingModule } from './app-routing.module';
 
+// Layout Module
+import { LayoutModule } from './layout/layout.module';
+
 @NgModule({
   declarations: [
     AppComponent
@@ -45,6 +48,9 @@ import { AppRoutingModule } from './app-routing.module';
     HttpClientModule,
     ReactiveFormsModule,
     FormsModule,
+    
+    // Layout Module
+    LayoutModule,
     
     // Angular Material
     MatToolbarModule,

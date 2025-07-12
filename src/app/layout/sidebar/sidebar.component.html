@@ -1,0 +1,89 @@
+<div class="sidebar-container">
+  
+  <!-- Header del sidebar -->
+  <div class="sidebar-header">
+    <div class="brand-section">
+      <div class="brand-icon">🧇</div>
+      <div class="brand-text">
+        <div class="brand-title">Diego's</div>
+        <div class="brand-subtitle">Wafles Admin</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Navegación -->
+  <nav class="sidebar-nav">
+    <mat-nav-list class="nav-list">
+      
+      <!-- Iterar sobre los elementos del menú -->
+      <ng-container *ngFor="let item of menuItems">
+        
+        <!-- Solo mostrar si tiene acceso -->
+        <ng-container *ngIf="hasAccess(item)">
+          
+          <!-- Elemento sin hijos -->
+          <mat-list-item 
+            *ngIf="!item.children"
+            class="nav-item"
+            [class.active]="isActive(item.route)"
+            (click)="navigateTo(item.route)">
+            
+            <mat-icon matListItemIcon class="nav-icon">{{ item.icon }}</mat-icon>
+            <span matListItemTitle class="nav-title">{{ item.title }}</span>
+            
+            <!-- Badge si existe -->
+            <span *ngIf="item.badge" 
+                  class="nav-badge" 
+                  matListItemMeta>{{ item.badge }}</span>
+          </mat-list-item>
+
+          <!-- Elemento con hijos (expandible) -->
+          <div *ngIf="item.children" class="nav-group">
+            
+            <!-- Header del grupo -->
+            <mat-list-item 
+              class="nav-item group-header"
+              [class.expanded]="isExpanded(item.title)"
+              (click)="toggleExpanded(item.title)">
+              
+              <mat-icon matListItemIcon class="nav-icon">{{ item.icon }}</mat-icon>
+              <span matListItemTitle class="nav-title">{{ item.title }}</span>
+              <mat-icon matListItemMeta class="expand-icon">
+                {{ isExpanded(item.title) ? 'keyboard_arrow_down' : 'keyboard_arrow_right' }}
+              </mat-icon>
+            </mat-list-item>
+
+            <!-- Hijos del grupo -->
+            <div class="nav-children" 
+                 [class.expanded]="isExpanded(item.title)">
+              
+              <mat-list-item 
+                *ngFor="let child of item.children"
+                class="nav-item child-item"
+                [class.active]="isActive(child.route)"
+                (click)="navigateTo(child.route)">
+                
+                <mat-icon matListItemIcon class="nav-icon child-icon">{{ child.icon }}</mat-icon>
+                <span matListItemTitle class="nav-title">{{ child.title }}</span>
+              </mat-list-item>
+              
+            </div>
+          </div>
+
+        </ng-container>
+      </ng-container>
+
+    </mat-nav-list>
+  </nav>
+
+  <!-- Footer del sidebar -->
+  <div class="sidebar-footer">
+    <div class="footer-info">
+      <div class="system-status">
+        <mat-icon class="status-icon online">circle</mat-icon>
+        <span>Sistema Activo</span>
+      </div>
+    </div>
+  </div>
+
+</div>
