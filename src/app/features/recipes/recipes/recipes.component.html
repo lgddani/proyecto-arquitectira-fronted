@@ -1,0 +1,389 @@
+<!-- src/app/features/recipes/recipes.component.html -->
+<div class="recipes-container">
+  
+  <!-- Header -->
+  <div class="page-header">
+    <div class="header-content">
+      <div class="header-text">
+        <h1>Gestión de Recetas</h1>
+        <p>Administra las recetas y formulaciones para Diego's Wafles</p>
+      </div>
+      <div class="header-actions">
+        <button mat-raised-button (click)="openCreateModal()" class="create-btn">
+          <mat-icon>add</mat-icon>
+          Nueva Receta
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Contenido principal -->
+  <div class="main-content">
+    
+    <!-- Barra de búsqueda -->
+    <mat-card class="search-card">
+      <mat-card-content>
+        <div class="search-section">
+          <mat-form-field appearance="outline" class="search-field">
+            <mat-label>Buscar recetas</mat-label>
+            <input matInput 
+                   [(ngModel)]="searchValue"
+                   (keyup)="applyFilter($event)" 
+                   placeholder="Nombre de la receta">
+            <mat-icon matSuffix>search</mat-icon>
+          </mat-form-field>
+          
+          <button mat-button 
+                  *ngIf="searchValue" 
+                  (click)="clearFilter()" 
+                  class="clear-btn">
+            <mat-icon>clear</mat-icon>
+            Limpiar
+          </button>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Tabla de recetas -->
+    <mat-card class="table-card">
+      <mat-card-header>
+        <mat-card-title>
+          <mat-icon>menu_book</mat-icon>
+          Lista de Recetas
+        </mat-card-title>
+        <mat-card-subtitle>
+          Total: {{ dataSource.data.length }} receta(s)
+        </mat-card-subtitle>
+      </mat-card-header>
+      
+      <mat-card-content>
+        
+        <!-- Loading -->
+        <div *ngIf="loading" class="loading-container">
+          <mat-spinner diameter="40"></mat-spinner>
+          <p class="loading-text">Cargando recetas...</p>
+        </div>
+
+        <!-- Tabla -->
+        <div *ngIf="!loading" class="table-container">
+          
+          <!-- Sin datos -->
+          <div *ngIf="dataSource.data.length === 0" class="empty-state">
+            <mat-icon>menu_book</mat-icon>
+            <h3>No hay recetas registradas</h3>
+            <p>Comienza creando tu primera receta</p>
+            <button mat-raised-button (click)="openCreateModal()">
+              <mat-icon>add</mat-icon>
+              Crear Receta
+            </button>
+          </div>
+
+          <!-- Tabla con datos -->
+          <table mat-table 
+                 [dataSource]="dataSource" 
+                 matSort 
+                 *ngIf="dataSource.data.length > 0"
+                 class="recipes-table">
+
+            <!-- Columna Nombre -->
+            <ng-container matColumnDef="recipeName">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>
+                <mat-icon>label</mat-icon>
+                Nombre de la Receta
+              </th>
+              <td mat-cell *matCellDef="let recipe">
+                <div class="recipe-name">
+                  <strong>{{ recipe.recipeName }}</strong>
+                </div>
+              </td>
+            </ng-container>
+
+            <!-- Columna Ingredientes -->
+            <ng-container matColumnDef="ingredients">
+              <th mat-header-cell *matHeaderCellDef>
+                <mat-icon>inventory_2</mat-icon>
+                Ingredientes
+              </th>
+              <td mat-cell *matCellDef="let recipe">
+                <div class="ingredients-preview">
+                  <mat-chip-set class="ingredients-chips">
+                    <mat-chip *ngFor="let ingredient of recipe.ingredientDetails.slice(0, 3)" 
+                             class="ingredient-chip">
+                      {{ ingredient.ingredientName }}
+                      <span class="ingredient-quantity">
+                        ({{ ingredient.requiredQuantity }} {{ ingredient.ingredientUnit }})
+                      </span>
+                    </mat-chip>
+                    <mat-chip *ngIf="recipe.ingredientDetails.length > 3" 
+                             class="more-chip">
+                      +{{ recipe.ingredientDetails.length - 3 }} más
+                    </mat-chip>
+                  </mat-chip-set>
+                </div>
+              </td>
+            </ng-container>
+
+            <!-- Columna Porciones Posibles -->
+            <ng-container matColumnDef="portions">
+              <th mat-header-cell *matHeaderCellDef>
+                <mat-icon>pie_chart</mat-icon>
+                Porciones Posibles
+              </th>
+              <td mat-cell *matCellDef="let recipe">
+                <div class="portions-info">
+                  <span class="portions-number">{{ getMaxPortions(recipe) }}</span>
+                  <small class="portions-label">porciones</small>
+                </div>
+              </td>
+            </ng-container>
+
+            <!-- Columna Estado -->
+            <ng-container matColumnDef="status">
+              <th mat-header-cell *matHeaderCellDef>
+                <mat-icon>info</mat-icon>
+                Estado
+              </th>
+              <td mat-cell *matCellDef="let recipe">
+                <div class="status-container">
+                  <mat-chip 
+                    [class]="'status-chip status-' + getRecipeStatus(recipe)">
+                    <mat-icon class="status-icon">{{ getRecipeStatusIcon(recipe) }}</mat-icon>
+                    {{ getRecipeStatusText(recipe) }}
+                  </mat-chip>
+                </div>
+              </td>
+            </ng-container>
+
+            <!-- Columna Acciones -->
+            <ng-container matColumnDef="actions">
+              <th mat-header-cell *matHeaderCellDef>Acciones</th>
+              <td mat-cell *matCellDef="let recipe">
+                <div class="actions-container">
+                  <button mat-icon-button 
+                          (click)="openViewModal(recipe)"
+                          matTooltip="Ver detalles"
+                          class="view-btn">
+                    <mat-icon>visibility</mat-icon>
+                  </button>
+                  
+                  <button mat-icon-button 
+                          (click)="openEditModal(recipe)"
+                          matTooltip="Editar receta"
+                          class="edit-btn">
+                    <mat-icon>edit</mat-icon>
+                  </button>
+                  
+                  <button mat-icon-button 
+                          (click)="deleteRecipe(recipe)"
+                          matTooltip="Eliminar receta"
+                          class="delete-btn">
+                    <mat-icon>delete</mat-icon>
+                  </button>
+                </div>
+              </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;" 
+                class="recipe-row"></tr>
+            
+          </table>
+
+          <!-- Paginador -->
+          <mat-paginator 
+            *ngIf="dataSource.data.length > 0"
+            [pageSizeOptions]="[5, 10, 25, 50]"
+            showFirstLastButtons
+            class="table-paginator">
+          </mat-paginator>
+          
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+  </div>
+</div>
+
+<!-- Modal para CRUD de recetas -->
+<div class="modal-overlay" *ngIf="showModal" (click)="closeModal()">
+  <div class="modal-container large-modal" (click)="$event.stopPropagation()">
+    
+    <!-- Header del modal -->
+    <div class="modal-header">
+      <div class="modal-title">
+        <mat-icon [class]="'modal-icon ' + modalData.mode">{{ getModalIcon() }}</mat-icon>
+        <h2>{{ getModalTitle() }}</h2>
+      </div>
+      <button mat-icon-button (click)="closeModal()" class="close-btn">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+
+    <!-- Contenido del modal -->
+    <div class="modal-content">
+      <form [formGroup]="recipeForm" (ngSubmit)="onSubmit()">
+        
+        <!-- Campo Nombre de la Receta -->
+        <mat-form-field appearance="outline" class="form-field">
+          <mat-label>Nombre de la Receta</mat-label>
+          <input matInput 
+                 formControlName="recipeName"
+                 placeholder="Ej: Waffle Clásico, Waffle de Chocolate..."
+                 [readonly]="isViewMode()">
+          <mat-icon matSuffix>label</mat-icon>
+          <mat-error>{{ getRecipeNameError() }}</mat-error>
+        </mat-form-field>
+
+        <!-- Sección de Ingredientes -->
+        <div class="ingredients-section">
+          <div class="section-header">
+            <h3>
+              <mat-icon>inventory_2</mat-icon>
+              Ingredientes de la Receta
+            </h3>
+            <button type="button" 
+                    mat-button 
+                    (click)="addIngredient()" 
+                    *ngIf="!isViewMode()"
+                    class="add-ingredient-btn">
+              <mat-icon>add</mat-icon>
+              Agregar Ingrediente
+            </button>
+          </div>
+
+          <!-- Lista de ingredientes -->
+          <div formArrayName="ingredients" class="ingredients-list">
+            
+            <!-- Mensaje si no hay ingredientes -->
+            <div *ngIf="ingredients.length === 0" class="no-ingredients">
+              <mat-icon>info</mat-icon>
+              <span>No hay ingredientes agregados. Haz clic en "Agregar Ingrediente" para comenzar.</span>
+            </div>
+
+            <!-- Ingredientes dinámicos -->
+            <div *ngFor="let ingredient of getIngredientControls(); let i = index" 
+                  [formGroupName]="i" 
+                  class="ingredient-item">
+              
+              <div class="ingredient-row">
+                <div class="ingredient-number">{{ i + 1 }}</div>
+                
+                <!-- Select de Ingrediente -->
+                <mat-form-field appearance="outline" class="ingredient-select">
+                  <mat-label>Ingrediente</mat-label>
+                  <mat-select formControlName="ingredientID" [disabled]="isViewMode()">
+                    <mat-option *ngFor="let availableIngredient of availableIngredients" 
+                               [value]="availableIngredient.ingredientID">
+                      {{ availableIngredient.ingredientName }}
+                      <span class="ingredient-unit">({{ availableIngredient.ingredientUnit }})</span>
+                    </mat-option>
+                  </mat-select>
+                  <mat-error>{{ getIngredientError(i, 'ingredientID') }}</mat-error>
+                </mat-form-field>
+
+                <!-- Cantidad Requerida -->
+                <mat-form-field appearance="outline" class="quantity-field">
+                  <mat-label>Cantidad</mat-label>
+                  <input matInput 
+                         type="number" 
+                         step="0.01"
+                         formControlName="requiredQuantity"
+                         placeholder="0"
+                         [readonly]="isViewMode()">
+                  <span matSuffix *ngIf="ingredient.get('ingredientID')?.value" 
+                        class="unit-suffix">
+                    {{ getIngredientUnit(ingredient.get('ingredientID')?.value) }}
+                  </span>
+                  <mat-error>{{ getIngredientError(i, 'requiredQuantity') }}</mat-error>
+                </mat-form-field>
+
+                <!-- Botón eliminar -->
+                <button type="button" 
+                        mat-icon-button 
+                        (click)="removeIngredient(i)" 
+                        *ngIf="!isViewMode()"
+                        class="remove-btn"
+                        matTooltip="Eliminar ingrediente">
+                  <mat-icon>remove_circle</mat-icon>
+                </button>
+              </div>
+
+              <!-- Información adicional en modo ver -->
+              <div *ngIf="isViewMode() && modalData.recipe" class="ingredient-details">
+                <ng-container *ngFor="let detail of modalData.recipe.ingredientDetails">
+                  <div *ngIf="detail.ingredientID === ingredient.get('ingredientID')?.value" 
+                       class="availability-info">
+                    <mat-icon [class]="detail.canMake ? 'available-icon' : 'unavailable-icon'">
+                      {{ detail.canMake ? 'check_circle' : 'error' }}
+                    </mat-icon>
+                    <span>
+                      Disponible: {{ detail.availableQuantity }} {{ detail.ingredientUnit }}
+                      {{ detail.canMake ? '(Suficiente)' : '(Insuficiente)' }}
+                    </span>
+                  </div>
+                </ng-container>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Información adicional en modo ver -->
+        <div *ngIf="isViewMode() && modalData.recipe" class="recipe-summary">
+          <mat-divider></mat-divider>
+          <div class="summary-section">
+            <h4>Resumen de la Receta</h4>
+            <div class="summary-grid">
+              <div class="summary-item">
+                <mat-icon>pie_chart</mat-icon>
+                <div>
+                  <span class="summary-label">Porciones Posibles</span>
+                  <span class="summary-value">{{ getMaxPortions(modalData.recipe) }}</span>
+                </div>
+              </div>
+              <div class="summary-item">
+                <mat-icon>{{ getRecipeStatusIcon(modalData.recipe) }}</mat-icon>
+                <div>
+                  <span class="summary-label">Estado</span>
+                  <span class="summary-value">{{ getRecipeStatusText(modalData.recipe) }}</span>
+                </div>
+              </div>
+              <div class="summary-item">
+                <mat-icon>inventory_2</mat-icon>
+                <div>
+                  <span class="summary-label">Total Ingredientes</span>
+                  <span class="summary-value">{{ modalData.recipe.ingredientDetails.length }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </form>
+    </div>
+
+    <!-- Footer del modal -->
+    <div class="modal-footer">
+      <button mat-button (click)="closeModal()" class="cancel-btn">
+        {{ isViewMode() ? 'Cerrar' : 'Cancelar' }}
+      </button>
+      
+      <button mat-raised-button 
+              (click)="onSubmit()"
+              [disabled]="modalLoading || isViewMode() || ingredients.length === 0"
+              *ngIf="!isViewMode()"
+              class="submit-btn">
+        
+        <div *ngIf="!modalLoading" class="button-content">
+          <mat-icon>{{ modalData.mode === 'create' ? 'add' : 'save' }}</mat-icon>
+          {{ modalData.mode === 'create' ? 'Crear Receta' : 'Actualizar Receta' }}
+        </div>
+        
+        <div *ngIf="modalLoading" class="button-loading">
+          <mat-spinner diameter="20"></mat-spinner>
+          {{ modalData.mode === 'create' ? 'Creando...' : 'Actualizando...' }}
+        </div>
+      </button>
+    </div>
+
+  </div>
+</div>

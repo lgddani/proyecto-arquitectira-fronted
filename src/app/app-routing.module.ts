@@ -40,11 +40,11 @@ const routes: Routes = [
         data: { roles: ['Administrador'] }
       },
       
-      // {
-      //   path: 'recipes',
-      //   loadChildren: () => import('./features/recipes/recipes.module').then(m => m.RecipesModule),
-      //   data: { roles: ['Administrador'] }
-      // },
+      {
+        path: 'recipes',
+        loadChildren: () => import('./features/recipes/recipes.module').then(m => m.RecipesModule),
+        data: { roles: ['Administrador'] }
+      },
       
       // {
       //   path: 'products',

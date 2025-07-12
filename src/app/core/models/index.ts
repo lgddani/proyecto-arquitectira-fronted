@@ -117,6 +117,19 @@ export interface RecipeCreate {
   }[];
 }
 
+export interface RecipeDetailDTO {
+  recipeID: number;
+  recipeName: string;
+  ingredients: RecipeIngredientDetailDTO[];
+}
+
+export interface RecipeIngredientDetailDTO {
+  ingredientID: number;
+  ingredientName: string;
+  ingredientUnit: string;
+  requiredQuantity: number;
+}
+
 // ============================================
 // PRODUCTS
 // ============================================
