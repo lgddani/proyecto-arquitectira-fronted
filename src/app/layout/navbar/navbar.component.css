@@ -68,7 +68,6 @@
 
 .user-button {
   display: flex;
-  align-items: center;
   gap: 12px;
   padding: 8px 16px;
   border-radius: 24px;
@@ -97,9 +96,6 @@
 }
 
 .user-info {
-  display: flex;
-  flex-direction: column;
-  text-align: left;
   line-height: 1.3;
 }
 

@@ -46,11 +46,11 @@ const routes: Routes = [
         data: { roles: ['Administrador'] }
       },
       
-      // {
-      //   path: 'products',
-      //   loadChildren: () => import('./features/products/products.module').then(m => m.ProductsModule),
-      //   data: { roles: ['Administrador'] }
-      // },
+      {
+        path: 'products',
+        loadChildren: () => import('./features/products/products.module').then(m => m.ProductsModule),
+        data: { roles: ['Administrador'] }
+      },
       
       // {
       //   path: 'orders',
