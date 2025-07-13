@@ -39,6 +39,14 @@ export interface ProductForOrder {
   maxQuantity?: number;
 }
 
+// Nueva interfaz para manejar errores de ingredientes
+export interface InsufficientIngredientsError {
+  alert: string;
+  status: boolean;
+  messages: string[];
+  data: null;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -64,11 +72,45 @@ export class OrdersService {
           throw new Error(response.alert || 'Error al crear orden');
         }),
         catchError(error => {
-          const message = error.error?.alert || error.message || 'Error de conexión';
-          this.toastr.error(message, 'Error');
+          console.error('Error en createOrder:', error);
+          
+          // Verificar si es un error de ingredientes insuficientes
+          if (error.error && error.error.messages && Array.isArray(error.error.messages)) {
+            this.showInsufficientIngredientsError(error.error);
+          } else {
+            // Error genérico
+            const message = error.error?.alert || error.message || 'Error de conexión';
+            this.toastr.error(message, 'Error');
+          }
+          
           return throwError(() => error);
         })
       );
+  }
+
+  // Método privado para mostrar errores de ingredientes insuficientes
+  private showInsufficientIngredientsError(errorResponse: InsufficientIngredientsError): void {
+    const title = errorResponse.alert || 'Ingredientes Insuficientes';
+    
+    // Mostrar el título principal
+    this.toastr.error(title, 'Error al Crear Orden', {
+      timeOut: 8000,
+      extendedTimeOut: 2000,
+      closeButton: true,
+      progressBar: true
+    });
+
+    // Mostrar cada ingrediente insuficiente como una notificación separada
+    errorResponse.messages.forEach((message, index) => {
+      setTimeout(() => {
+        this.toastr.warning(message, 'Ingrediente Faltante', {
+          timeOut: 6000,
+          extendedTimeOut: 2000,
+          closeButton: true,
+          progressBar: true
+        });
+      }, index * 1000); // Escalonar las notificaciones cada segundo
+    });
   }
 
   // Obtener todas las órdenes
@@ -155,5 +197,18 @@ export class OrdersService {
       hour: '2-digit',
       minute: '2-digit'
     });
+  }
+
+  // Método auxiliar para extraer mensajes de error de ingredientes
+  getInsufficientIngredientsMessages(error: any): string[] {
+    if (error?.error?.messages && Array.isArray(error.error.messages)) {
+      return error.error.messages;
+    }
+    return [];
+  }
+
+  // Método auxiliar para verificar si un error es de ingredientes insuficientes
+  isInsufficientIngredientsError(error: any): boolean {
+    return error?.error?.messages && Array.isArray(error.error.messages) && error.error.messages.length > 0;
   }
 }

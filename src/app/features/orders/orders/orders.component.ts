@@ -19,6 +19,11 @@ export interface OrderModalData {
   mode: 'create' | 'view';
 }
 
+export interface IngredientsErrorData {
+  title: string;
+  messages: string[];
+}
+
 @Component({
   selector: 'app-orders',
   standalone: false,
@@ -40,11 +45,15 @@ export class OrdersComponent implements OnInit, OnDestroy {
   loading = false;
   searchValue = '';
   
-  // Modal
+  // Modal principal
   showModal = false;
   modalData: OrderModalData = { mode: 'create' };
   orderForm: FormGroup;
   modalLoading = false;
+
+  // Modal de ingredientes insuficientes
+  showIngredientsErrorModal = false;
+  ingredientsErrorData: IngredientsErrorData = { title: '', messages: [] };
 
   // Datos auxiliares
   availableProducts: ProductForOrder[] = [];
@@ -196,6 +205,20 @@ export class OrdersComponent implements OnInit, OnDestroy {
     this.modalData = { mode: 'create' };
   }
 
+  // ========================================
+  // MÉTODOS DE MODAL DE INGREDIENTES
+  // ========================================
+
+  openIngredientsErrorModal(title: string, messages: string[]): void {
+    this.ingredientsErrorData = { title, messages };
+    this.showIngredientsErrorModal = true;
+  }
+
+  closeIngredientsErrorModal(): void {
+    this.showIngredientsErrorModal = false;
+    this.ingredientsErrorData = { title: '', messages: [] };
+  }
+
   onSubmit(): void {
     if (this.orderForm.invalid || this.modalData.mode === 'view') {
       if (this.modalData.mode !== 'view') {
@@ -227,6 +250,16 @@ export class OrdersComponent implements OnInit, OnDestroy {
         },
         error: (error) => {
           console.error('Error creando orden:', error);
+          
+          // Verificar si es un error de ingredientes insuficientes
+          if (this.ordersService.isInsufficientIngredientsError(error)) {
+            const title = error.error?.alert || 'Ingredientes Insuficientes';
+            const messages = this.ordersService.getInsufficientIngredientsMessages(error);
+            
+            // Mostrar modal de ingredientes insuficientes
+            this.openIngredientsErrorModal(title, messages);
+          }
+          // Los errores genéricos ya se manejan en el servicio con toastr
         }
       });
   }
@@ -278,24 +311,24 @@ export class OrdersComponent implements OnInit, OnDestroy {
     }, 0);
   }
 
-getOrderTotal(order?: OrderDetailDTO): number {
-  if (order) {
-    return order.products.reduce((sum, product) => sum + product.subtotal, 0);
-  }
-
-  const total = this.getProductControls().reduce((sum, control) => {
-    const productID = control.get('productID')?.value;
-    const quantity = control.get('quantity')?.value;
-    
-    if (productID && quantity) {
-      const price = this.getProductPrice(productID);
-      return sum + (price * quantity);
+  getOrderTotal(order?: OrderDetailDTO): number {
+    if (order) {
+      return order.products.reduce((sum, product) => sum + product.subtotal, 0);
     }
-    return sum;
-  }, 0);
 
-  return total;
-}
+    const total = this.getProductControls().reduce((sum, control) => {
+      const productID = control.get('productID')?.value;
+      const quantity = control.get('quantity')?.value;
+      
+      if (productID && quantity) {
+        const price = this.getProductPrice(productID);
+        return sum + (price * quantity);
+      }
+      return sum;
+    }, 0);
+
+    return total;
+  }
 
   formatPrice(price: number): string {
     return this.ordersService.formatPrice(price);

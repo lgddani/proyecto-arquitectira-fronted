@@ -412,4 +412,80 @@
     </div>
 
   </div>
+
+
+<div class="modal-overlay ingredients-error-overlay" *ngIf="showIngredientsErrorModal" (click)="closeIngredientsErrorModal()">
+  <div class="modal-container ingredients-error-modal" (click)="$event.stopPropagation()">
+    
+    <!-- Header del modal -->
+    <div class="modal-header error-header">
+      <div class="modal-title">
+        <mat-icon class="error-icon">error</mat-icon>
+        <h2>{{ ingredientsErrorData.title }}</h2>
+      </div>
+      <button mat-icon-button (click)="closeIngredientsErrorModal()" class="close-btn">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+
+    <!-- Contenido del modal -->
+    <div class="modal-content">
+      <div class="error-content">
+        <div class="error-description">
+          <mat-icon>info</mat-icon>
+          <p>No se puede procesar la orden debido a ingredientes insuficientes en el inventario:</p>
+        </div>
+
+        <div class="ingredients-list">
+          <h4>
+            <mat-icon>inventory_2</mat-icon>
+            Ingredientes Faltantes
+          </h4>
+          
+          <div class="ingredient-item" *ngFor="let message of ingredientsErrorData.messages">
+            <mat-icon class="ingredient-icon">remove_circle</mat-icon>
+            <span class="ingredient-message">{{ message }}</span>
+          </div>
+        </div>
+
+        <div class="suggestions">
+          <h4>
+            <mat-icon>lightbulb</mat-icon>
+            Sugerencias
+          </h4>
+          <ul class="suggestions-list">
+            <li>
+              <mat-icon>shopping_cart</mat-icon>
+              Verifica el inventario de ingredientes
+            </li>
+            <li>
+              <mat-icon>refresh</mat-icon>
+              Reabastece los ingredientes faltantes
+            </li>
+            <li>
+              <mat-icon>edit</mat-icon>
+              Modifica la cantidad de productos en la orden
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer del modal -->
+    <div class="modal-footer">
+      <button mat-button (click)="closeIngredientsErrorModal()" class="cancel-btn">
+        Entendido
+      </button>
+      
+      <button mat-raised-button 
+              (click)="closeIngredientsErrorModal()"
+              class="retry-btn">
+        <mat-icon>edit</mat-icon>
+        Modificar Orden
+      </button>
+    </div>
+
+  </div>
+</div>
+
 </div>
