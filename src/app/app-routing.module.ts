@@ -52,11 +52,11 @@ const routes: Routes = [
         data: { roles: ['Administrador'] }
       },
       
-      // {
-      //   path: 'orders',
-      //   loadChildren: () => import('./features/orders/orders.module').then(m => m.OrdersModule),
-      //   data: { roles: ['Administrador', 'Vendedor'] }
-      // },
+      {
+        path: 'orders',
+        loadChildren: () => import('./features/orders/orders.module').then(m => m.OrdersModule),
+        data: { roles: ['Administrador', 'Vendedor'] }
+      },
       
       // {
       //   path: 'users',

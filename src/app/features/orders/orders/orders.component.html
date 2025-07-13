@@ -1,0 +1,415 @@
+<!-- src/app/features/orders/orders/orders.component.html -->
+<div class="orders-container">
+  
+  <!-- Header -->
+  <div class="page-header">
+    <div class="header-content">
+      <div class="header-text">
+        <h1>Gestión de Órdenes</h1>
+        <p>Administra las órdenes de venta para Diego's Wafles</p>
+      </div>
+      <div class="header-actions">
+        <button mat-raised-button (click)="openCreateModal()" class="create-btn">
+          <mat-icon>add_shopping_cart</mat-icon>
+          Nueva Orden
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Contenido principal -->
+  <div class="main-content">
+    
+    <!-- Barra de búsqueda -->
+    <mat-card class="search-card">
+      <mat-card-content>
+        <div class="search-section">
+          <mat-form-field appearance="outline" class="search-field">
+            <mat-label>Buscar órdenes</mat-label>
+            <input matInput 
+                   [(ngModel)]="searchValue"
+                   (keyup)="applyFilter($event)" 
+                   placeholder="ID de orden o comentario">
+            <mat-icon matSuffix>search</mat-icon>
+          </mat-form-field>
+          
+          <button mat-button 
+                  *ngIf="searchValue" 
+                  (click)="clearFilter()" 
+                  class="clear-btn">
+            <mat-icon>clear</mat-icon>
+            Limpiar
+          </button>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Tabla de órdenes -->
+    <mat-card class="table-card">
+      <mat-card-header>
+        <mat-card-title>
+          <mat-icon>receipt_long</mat-icon>
+          Lista de Órdenes
+        </mat-card-title>
+        <mat-card-subtitle>
+          Total: {{ dataSource.data.length }} orden(es)
+        </mat-card-subtitle>
+      </mat-card-header>
+      
+      <mat-card-content>
+        
+        <!-- Loading -->
+        <div *ngIf="loading" class="loading-container">
+          <mat-spinner diameter="40"></mat-spinner>
+          <p class="loading-text">Cargando órdenes...</p>
+        </div>
+
+        <!-- Tabla -->
+        <div *ngIf="!loading" class="table-container">
+          
+          <!-- Sin datos -->
+          <div *ngIf="dataSource.data.length === 0" class="empty-state">
+            <mat-icon>receipt_long</mat-icon>
+            <h3>No hay órdenes registradas</h3>
+            <p>Comienza creando tu primera orden</p>
+            <button mat-raised-button (click)="openCreateModal()">
+              <mat-icon>add</mat-icon>
+              Crear Orden
+            </button>
+          </div>
+
+          <!-- Tabla con datos -->
+          <table mat-table 
+                 [dataSource]="dataSource" 
+                 matSort 
+                 *ngIf="dataSource.data.length > 0"
+                 class="orders-table">
+
+            <!-- Columna ID -->
+            <ng-container matColumnDef="orderID">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>
+                <mat-icon>confirmation_number</mat-icon>
+                ID Orden
+              </th>
+              <td mat-cell *matCellDef="let order">
+                <span class="order-id">#{{ order.orderID }}</span>
+              </td>
+            </ng-container>
+
+            <!-- Columna Fecha -->
+            <ng-container matColumnDef="createdAt">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>
+                <mat-icon>schedule</mat-icon>
+                Fecha y Hora
+              </th>
+              <td mat-cell *matCellDef="let order">
+                <span class="order-date">{{ formatDate(order.createdAt) }}</span>
+              </td>
+            </ng-container>
+
+            <!-- Columna Productos -->
+            <ng-container matColumnDef="products">
+              <th mat-header-cell *matHeaderCellDef>
+                <mat-icon>fastfood</mat-icon>
+                Productos
+              </th>
+              <td mat-cell *matCellDef="let order">
+                <div class="products-preview">
+                  <mat-chip-set class="products-chips">
+                    <mat-chip *ngFor="let product of order.products.slice(0, 3)" 
+                             class="product-chip">
+                      {{ product.productName }}
+                      <span class="product-quantity">
+                        ({{ product.quantity }})
+                      </span>
+                    </mat-chip>
+                    <mat-chip *ngIf="order.products.length > 3" 
+                             class="more-chip">
+                      +{{ order.products.length - 3 }} más
+                    </mat-chip>
+                  </mat-chip-set>
+                </div>
+              </td>
+            </ng-container>
+
+            <!-- Columna Total -->
+            <ng-container matColumnDef="total">
+              <th mat-header-cell *matHeaderCellDef>
+                <mat-icon>attach_money</mat-icon>
+                Total
+              </th>
+              <td mat-cell *matCellDef="let order">
+                <div class="total-info">
+                  <span class="total-amount">{{ formatPrice(getOrderTotal(order)) }}</span>
+                  <small class="total-label">Total</small>
+                </div>
+              </td>
+            </ng-container>
+
+            <!-- Columna Comentario -->
+            <ng-container matColumnDef="comment">
+              <th mat-header-cell *matHeaderCellDef>
+                <mat-icon>comment</mat-icon>
+                Comentario
+              </th>
+              <td mat-cell *matCellDef="let order">
+                <div class="comment-cell" [matTooltip]="order.comment || 'Sin comentarios'">
+                  {{ order.comment || 'Sin comentarios' }}
+                </div>
+              </td>
+            </ng-container>
+
+            <!-- Columna Acciones -->
+            <ng-container matColumnDef="actions">
+              <th mat-header-cell *matHeaderCellDef>Acciones</th>
+              <td mat-cell *matCellDef="let order">
+                <div class="actions-container">
+                  <button mat-icon-button 
+                          (click)="openViewModal(order)"
+                          matTooltip="Ver detalles"
+                          class="view-btn">
+                    <mat-icon>visibility</mat-icon>
+                  </button>
+                </div>
+              </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;" 
+                class="order-row"></tr>
+            
+          </table>
+
+          <!-- Paginador -->
+          <mat-paginator 
+            *ngIf="dataSource.data.length > 0"
+            [pageSizeOptions]="[5, 10, 25, 50]"
+            showFirstLastButtons
+            class="table-paginator">
+          </mat-paginator>
+          
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+  </div>
+</div>
+
+<!-- Modal para CRUD de órdenes -->
+<div class="modal-overlay" *ngIf="showModal" (click)="closeModal()">
+  <div class="modal-container" (click)="$event.stopPropagation()">
+    
+    <!-- Header del modal -->
+    <div class="modal-header">
+      <div class="modal-title">
+        <mat-icon [class]="'modal-icon ' + modalData.mode">{{ getModalIcon() }}</mat-icon>
+        <h2>{{ getModalTitle() }}</h2>
+      </div>
+      <button mat-icon-button (click)="closeModal()" class="close-btn">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+
+    <!-- Contenido del modal -->
+    <div class="modal-content">
+      
+      <!-- Formulario para crear orden -->
+      <form *ngIf="!isViewMode()" [formGroup]="orderForm" (ngSubmit)="onSubmit()">
+        
+        <!-- Campo Comentario -->
+        <mat-form-field appearance="outline" class="form-field">
+          <mat-label>Comentario (opcional)</mat-label>
+          <textarea matInput 
+                   formControlName="comment"
+                   placeholder="Comentarios adicionales sobre la orden..."
+                   rows="3"></textarea>
+          <mat-icon matSuffix>comment</mat-icon>
+          <mat-hint>Información adicional sobre la orden</mat-hint>
+        </mat-form-field>
+
+        <!-- Sección de Productos -->
+        <div class="products-section">
+          <div class="section-header">
+            <h3>
+              <mat-icon>fastfood</mat-icon>
+              Productos de la Orden
+            </h3>
+            <button type="button" 
+                    mat-button 
+                    (click)="addProduct()" 
+                    class="add-product-btn">
+              <mat-icon>add</mat-icon>
+              Agregar Producto
+            </button>
+          </div>
+
+          <!-- Lista de productos -->
+          <div formArrayName="products" class="products-list">
+            
+            <!-- Mensaje si no hay productos -->
+            <div *ngIf="products.length === 0" class="no-products">
+              <mat-icon>info</mat-icon>
+              <span>No hay productos agregados. Haz clic en "Agregar Producto" para comenzar.</span>
+            </div>
+
+            <!-- Productos dinámicos -->
+            <div *ngFor="let product of getProductControls(); let i = index" 
+                  [formGroupName]="i" 
+                  class="product-item">
+              
+              <div class="product-row">
+                <div class="product-number">{{ i + 1 }}</div>
+                
+                <!-- Select de Producto -->
+                <mat-form-field appearance="outline" class="product-select">
+                  <mat-label>Producto</mat-label>
+                  <mat-select formControlName="productID">
+                    <mat-option *ngFor="let availableProduct of getAvailableProductsForField(i)" 
+                               [value]="availableProduct.productID">
+                      {{ availableProduct.productName }}
+                      <span class="product-price">({{ formatPrice(availableProduct.productPrice) }})</span>
+                    </mat-option>
+                  </mat-select>
+                  <mat-error>{{ getProductError(i, 'productID') }}</mat-error>
+                </mat-form-field>
+
+                <!-- Cantidad -->
+                <mat-form-field appearance="outline" class="quantity-field">
+                  <mat-label>Cantidad</mat-label>
+                  <input matInput 
+                         type="number" 
+                         min="1"
+                         max="99"
+                         formControlName="quantity"
+                         placeholder="1">
+                  <mat-error>{{ getProductError(i, 'quantity') }}</mat-error>
+                </mat-form-field>
+
+                <!-- Botón eliminar -->
+                <button type="button" 
+                        mat-icon-button 
+                        (click)="removeProduct(i)" 
+                        class="remove-btn"
+                        matTooltip="Eliminar producto">
+                  <mat-icon>remove_circle</mat-icon>
+                </button>
+              </div>
+
+              <!-- Subtotal -->
+              <div *ngIf="product.get('productID')?.value && product.get('quantity')?.value" 
+                   class="product-subtotal">
+                <mat-icon>calculate</mat-icon>
+                <span>Subtotal: {{ getProductSubtotal(i) }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Resumen de la orden -->
+        <div *ngIf="products.length > 0" class="order-summary">
+          <h4>
+            <mat-icon>receipt</mat-icon>
+            Resumen de la Orden
+          </h4>
+          
+          <div class="summary-item">
+            <span class="summary-label">Productos:</span>
+            <span class="summary-value">{{ getTotalItems() }}</span>
+          </div>
+          
+          <div class="summary-item total">
+            <span class="summary-label">Total:</span>
+            <span class="summary-value total">{{ formatPrice(getOrderTotal()) }}</span>
+          </div>
+        </div>
+
+      </form>
+
+      <!-- Vista de detalles -->
+      <div *ngIf="isViewMode() && modalData.order" class="order-details">
+        
+        <!-- Información general -->
+        <div class="detail-section">
+          <h4>
+            <mat-icon>info</mat-icon>
+            Información General
+          </h4>
+          <div class="info-grid">
+            <div class="info-item">
+              <mat-icon>confirmation_number</mat-icon>
+              <div>
+                <span class="info-label">ID de Orden</span>
+                <span class="info-value">#{{ modalData.order.orderID }}</span>
+              </div>
+            </div>
+            <div class="info-item">
+              <mat-icon>schedule</mat-icon>
+              <div>
+                <span class="info-label">Fecha y Hora</span>
+                <span class="info-value">{{ formatDate(modalData.order.createdAt) }}</span>
+              </div>
+            </div>
+            <div class="info-item">
+              <mat-icon>attach_money</mat-icon>
+              <div>
+                <span class="info-label">Total</span>
+                <span class="info-value">{{ formatPrice(getOrderTotal(modalData.order)) }}</span>
+              </div>
+            </div>
+            <div class="info-item" *ngIf="modalData.order.comment">
+              <mat-icon>comment</mat-icon>
+              <div>
+                <span class="info-label">Comentario</span>
+                <span class="info-value">{{ modalData.order.comment }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Productos de la orden -->
+        <div class="detail-section">
+          <h4>
+            <mat-icon>fastfood</mat-icon>
+            Productos Ordenados
+          </h4>
+          <div class="products-detail-list">
+            <div *ngFor="let product of modalData.order.products" class="product-detail-item">
+              <div class="product-detail-info">
+                <div class="product-detail-name">{{ product.productName }}</div>
+                <div class="product-detail-price">{{ formatPrice(product.productPrice) }} c/u</div>
+              </div>
+              <div class="product-detail-quantity">x{{ product.quantity }}</div>
+              <div class="product-detail-subtotal">{{ formatPrice(product.subtotal) }}</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Footer del modal -->
+    <div class="modal-footer">
+      <button mat-button (click)="closeModal()" class="cancel-btn">
+        {{ isViewMode() ? 'Cerrar' : 'Cancelar' }}
+      </button>
+      
+      <button mat-raised-button 
+              (click)="onSubmit()"
+              [disabled]="modalLoading || isViewMode() || products.length === 0"
+              *ngIf="!isViewMode()"
+              class="submit-btn">
+        
+        <div *ngIf="!modalLoading" class="button-content">
+          <mat-icon>add_shopping_cart</mat-icon>
+          Crear Orden
+        </div>
+        
+        <div *ngIf="modalLoading" class="button-loading">
+          <mat-spinner diameter="20"></mat-spinner>
+          Creando orden...
+        </div>
+      </button>
+    </div>
+
+  </div>
+</div>
