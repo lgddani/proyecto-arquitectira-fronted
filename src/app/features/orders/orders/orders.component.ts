@@ -375,4 +375,16 @@ export class OrdersComponent implements OnInit, OnDestroy {
     }
     return '';
   }
+
+  // ========================================
+  // MÉTODOS DE TRACKING PARA CARDS
+  // ========================================
+
+  trackByOrderId(index: number, order: OrderDetailDTO): number {
+    return order.orderID;
+  }
+
+  trackByProductId(index: number, product: any): number {
+    return product.productID || index;
+  }
 }
