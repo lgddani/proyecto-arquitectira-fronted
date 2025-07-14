@@ -48,11 +48,11 @@
     <mat-card class="table-card">
       <mat-card-header>
         <mat-card-title>
-          <mat-icon>dashboard</mat-icon>
-          Vista de Órdenes
+          <mat-icon>receipt_long</mat-icon>
+          Lista de Órdenes
         </mat-card-title>
         <mat-card-subtitle>
-          {{ dataSource.data.length }} orden(es) • Vista de tarjetas
+          Total: {{ dataSource.data.length }} orden(es)
         </mat-card-subtitle>
       </mat-card-header>
       
@@ -78,102 +78,125 @@
             </button>
           </div>
 
-          <!-- Grid de órdenes con cards -->
-          <div class="orders-grid" *ngIf="dataSource.data.length > 0">
-            
-            <!-- Card de orden -->
-            <div class="order-card" 
-                 *ngFor="let order of dataSource.data; trackBy: trackByOrderId"
-                 (click)="openViewModal(order)"
-                 [class.order-card--featured]="order.products.length > 5">
-              
-              <!-- Header de la card -->
-              <div class="order-card__header">
-                <div class="order-card__id">
-                  <mat-icon class="order-card__icon">receipt</mat-icon>
-                  <span class="order-card__number">#{{ order.orderID }}</span>
-                </div>
-                <div class="order-card__status">
-                  <div class="status-badge status-badge--active">
+          <!-- Tabla de órdenes -->
+          <table mat-table 
+                 [dataSource]="dataSource" 
+                 matSort 
+                 *ngIf="dataSource.data.length > 0"
+                 class="orders-table">
+
+            <!-- Columna ID -->
+            <ng-container matColumnDef="orderID">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>
+                <mat-icon>confirmation_number</mat-icon>
+                ID Orden
+              </th>
+              <td mat-cell *matCellDef="let order">
+                <div class="order-id-container">
+                  <span class="order-id">#{{ order.orderID }}</span>
+                  <div class="order-status">
                     <mat-icon>check_circle</mat-icon>
-                    Activa
+                    <span>Activa</span>
                   </div>
                 </div>
-              </div>
+              </td>
+            </ng-container>
 
-              <!-- Contenido principal -->
-              <div class="order-card__content">
-                
-                <!-- Información de fecha -->
-                <div class="order-card__date">
-                  <mat-icon>schedule</mat-icon>
-                  <span>{{ formatDate(order.createdAt) }}</span>
+            <!-- Columna Fecha -->
+            <ng-container matColumnDef="createdAt">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>
+                <mat-icon>schedule</mat-icon>
+                Fecha y Hora
+              </th>
+              <td mat-cell *matCellDef="let order">
+                <div class="order-date-container">
+                  <mat-icon>event</mat-icon>
+                  <span class="order-date">{{ formatDate(order.createdAt) }}</span>
                 </div>
+              </td>
+            </ng-container>
 
-                <!-- Productos -->
-                <div class="order-card__products">
-                  <h4 class="order-card__section-title">
-                    <mat-icon>fastfood</mat-icon>
-                    Productos ({{ order.products.length }})
-                  </h4>
-                  
-                  <div class="products-grid">
-                    <div class="product-item" 
-                         *ngFor="let product of order.products.slice(0, 4); trackBy: trackByProductId">
-                      <div class="product-item__icon">
+            <!-- Columna Productos -->
+            <ng-container matColumnDef="products">
+              <th mat-header-cell *matHeaderCellDef>
+                <mat-icon>fastfood</mat-icon>
+                Productos
+              </th>
+              <td mat-cell *matCellDef="let order">
+                <div class="products-container">
+                  <div class="products-count">
+                    <mat-icon>inventory</mat-icon>
+                    <span>{{ order.products.length }} productos</span>
+                  </div>
+                  <div class="products-preview">
+                    <mat-chip-set class="products-chips">
+                      <mat-chip *ngFor="let product of order.products.slice(0, 3)" 
+                               class="product-chip">
                         <mat-icon>local_pizza</mat-icon>
-                      </div>
-                      <div class="product-item__info">
-                        <span class="product-item__name">{{ product.productName }}</span>
-                        <span class="product-item__quantity">{{ product.quantity }}x</span>
-                      </div>
-                    </div>
-                    
-                    <div class="product-item product-item--more" 
-                         *ngIf="order.products.length > 4">
-                      <div class="product-item__icon">
+                        {{ product.productName }}
+                        <span class="product-quantity">
+                          ({{ product.quantity }})
+                        </span>
+                      </mat-chip>
+                      <mat-chip *ngIf="order.products.length > 3" 
+                               class="more-chip">
                         <mat-icon>more_horiz</mat-icon>
-                      </div>
-                      <div class="product-item__info">
-                        <span class="product-item__name">+{{ order.products.length - 4 }} más</span>
-                      </div>
-                    </div>
+                        +{{ order.products.length - 3 }} más
+                      </mat-chip>
+                    </mat-chip-set>
                   </div>
                 </div>
+              </td>
+            </ng-container>
 
-                <!-- Comentario -->
-                <div class="order-card__comment" *ngIf="order.comment">
-                  <mat-icon>comment</mat-icon>
-                  <span>{{ order.comment }}</span>
+            <!-- Columna Total -->
+            <ng-container matColumnDef="total">
+              <th mat-header-cell *matHeaderCellDef>
+                <mat-icon>attach_money</mat-icon>
+                Total
+              </th>
+              <td mat-cell *matCellDef="let order">
+                <div class="total-container">
+                  <div class="total-amount">{{ formatPrice(getOrderTotal(order)) }}</div>
+                  <div class="total-label">Total de la orden</div>
                 </div>
+              </td>
+            </ng-container>
 
-              </div>
-
-              <!-- Footer de la card -->
-              <div class="order-card__footer">
-                <div class="order-card__total">
-                  <span class="total-label">Total</span>
-                  <span class="total-amount">{{ formatPrice(getOrderTotal(order)) }}</span>
+            <!-- Columna Comentario -->
+            <ng-container matColumnDef="comment">
+              <th mat-header-cell *matHeaderCellDef>
+                <mat-icon>comment</mat-icon>
+                Comentario
+              </th>
+              <td mat-cell *matCellDef="let order">
+                <div class="comment-container" [matTooltip]="order.comment || 'Sin comentarios'">
+                  <mat-icon>chat_bubble</mat-icon>
+                  <span class="comment-text">{{ order.comment || 'Sin comentarios' }}</span>
                 </div>
-                
-                <div class="order-card__actions">
+              </td>
+            </ng-container>
+
+            <!-- Columna Acciones -->
+            <ng-container matColumnDef="actions">
+              <th mat-header-cell *matHeaderCellDef>Acciones</th>
+              <td mat-cell *matCellDef="let order">
+                <div class="actions-container">
                   <button mat-icon-button 
-                          (click)="openViewModal(order); $event.stopPropagation()"
+                          (click)="openViewModal(order)"
                           matTooltip="Ver detalles"
-                          class="action-btn">
+                          class="view-btn">
                     <mat-icon>visibility</mat-icon>
                   </button>
                 </div>
-              </div>
+              </td>
+            </ng-container>
 
-              <!-- Indicador de hover -->
-              <div class="order-card__hover-indicator">
-                <mat-icon>arrow_forward</mat-icon>
-              </div>
-
-            </div>
-
-          </div>
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;" 
+                class="order-row"></tr>
+            
+          </table>
 
           <!-- Paginador -->
           <mat-paginator 
