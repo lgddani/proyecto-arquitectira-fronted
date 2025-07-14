@@ -2,12 +2,47 @@
 // INTERFACES PRINCIPALES PARA DIEGO'S WAFLES
 // ============================================
 
-// Respuesta genérica del API
+// Genérica para respuestas del backend
 export interface ApiResponse<T = any> {
   alert: string;
   status: boolean;
   messages: string[];
-  data: T;
+  data: T | null;
+}
+
+// Genérica para respuestas paginadas
+export interface PaginatedResponse<T> {
+  content: T[];
+  totalElements: number;
+  totalPages: number;
+  size: number;
+  number: number;
+}
+
+// Tipos para formularios
+export interface FormValidationErrors {
+  [key: string]: string;
+}
+
+// Estados de carga
+export interface LoadingState {
+  loading: boolean;
+  error: string | null;
+}
+
+// Filtros genéricos
+export interface BaseFilter {
+  page?: number;
+  size?: number;
+  sort?: string;
+  search?: string;
+}
+
+// Opción para selects
+export interface SelectOption<T = string | number> {
+  value: T;
+  label: string;
+  disabled?: boolean;
 }
 
 // ============================================
@@ -43,13 +78,9 @@ export interface UserListDTO {
   roleName: string;
 }
 
-export interface UserRegister {
-  userName: string;
-  userEmail: string;
-  userPhone: string;
+export interface UserRegister extends Omit<User, 'userID' | 'userStatus' | 'rolName'> {
   userPassword: string;
   userConfirmPassword: string;
-  rolID: number;
 }
 
 export interface PasswordUpdate {
@@ -96,17 +127,20 @@ export interface IngredientWithProvider extends Ingredient {
 // RECIPES
 // ============================================
 
-export interface Recipe {
-  recipeID: number;
-  recipeName: string;
-  ingredients: RecipeIngredientDetail[];
-}
-
-export interface RecipeIngredientDetail {
+export interface BaseRecipeIngredient {
   ingredientID: number;
   ingredientName: string;
   ingredientUnit: string;
   requiredQuantity: number;
+}
+
+export type RecipeIngredientDetail = BaseRecipeIngredient;
+export type RecipeIngredientDetailDTO = BaseRecipeIngredient;
+
+export interface Recipe {
+  recipeID: number;
+  recipeName: string;
+  ingredients: RecipeIngredientDetail[];
 }
 
 export interface RecipeCreate {
@@ -121,13 +155,6 @@ export interface RecipeDetailDTO {
   recipeID: number;
   recipeName: string;
   ingredients: RecipeIngredientDetailDTO[];
-}
-
-export interface RecipeIngredientDetailDTO {
-  ingredientID: number;
-  ingredientName: string;
-  ingredientUnit: string;
-  requiredQuantity: number;
 }
 
 // ============================================
@@ -174,45 +201,5 @@ export interface OrderProductDetail {
 
 export interface OrderCreate {
   comment: string;
-  products: {
-    productID: number;
-    quantity: number;
-  }[];
-}
-
-// ============================================
-// UTILITY TYPES
-// ============================================
-
-export interface PaginatedResponse<T> {
-  content: T[];
-  totalElements: number;
-  totalPages: number;
-  size: number;
-  number: number;
-}
-
-export interface SelectOption {
-  value: any;
-  label: string;
-  disabled?: boolean;
-}
-
-// Tipos para formularios
-export interface FormValidationErrors {
-  [key: string]: string;
-}
-
-// Estados de loading
-export interface LoadingState {
-  loading: boolean;
-  error: string | null;
-}
-
-// Filtros genéricos
-export interface BaseFilter {
-  page?: number;
-  size?: number;
-  sort?: string;
-  search?: string;
+  products: Pick<OrderProductDetail, 'productID' | 'quantity'>[];
 }
