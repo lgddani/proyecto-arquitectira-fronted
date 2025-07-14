@@ -214,7 +214,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     const userName = this.currentUser?.userName || 'Usuario';
     
     if (this.stats.ordersToday > 0) {
-      return `${baseGreeting}, ${userName}! 🎉 Ya llevas ${this.stats.ordersToday} orden(es) hoy`;
+      return `${baseGreeting}, ${userName}! 🧇 Ya llevas ${this.stats.ordersToday} orden(es) hoy`;
     } else {
       return `${baseGreeting}, ${userName}! 🧇 ¡Listo para un gran día!`;
     }
