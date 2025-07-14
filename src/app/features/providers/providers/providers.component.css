@@ -322,6 +322,37 @@
   overflow: hidden;
 }
 
+.actions-container button.view-btn {
+  background: linear-gradient(135deg, #dc3545, #c82333) !important;
+  color: white !important;
+  border: 1px solid rgba(220, 53, 69, 0.2) !important;
+}
+.actions-container button.view-btn:hover {
+  background: linear-gradient(135deg, #c82333, #a71e2a) !important;
+  box-shadow: 0 4px 16px rgba(220, 53, 69, 0.3) !important;
+}
+
+.actions-container button.edit-btn {
+  background: linear-gradient(135deg, #ffc107, #ff9800) !important;
+  color: #8b4513 !important;
+  border: 1px solid rgba(255, 193, 7, 0.2) !important;
+}
+.actions-container button.edit-btn:hover {
+  background: linear-gradient(135deg, #ff9800, #f57c00) !important;
+  box-shadow: 0 4px 16px rgba(255, 193, 7, 0.3) !important;
+}
+
+.actions-container button.delete-btn {
+  background: linear-gradient(135deg, #dc3545, #c82333) !important;
+  color: white !important;
+  border: 1px solid rgba(220, 53, 69, 0.2) !important;
+}
+.actions-container button.delete-btn:hover {
+  background: linear-gradient(135deg, #c82333, #a71e2a) !important;
+  box-shadow: 0 4px 16px rgba(220, 53, 69, 0.3) !important;
+  animation: shake 0.5s ease-in-out;
+}
+
 .actions-container button::before {
   content: '';
   position: absolute;
@@ -332,51 +363,8 @@
   background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
   transition: left 0.5s;
 }
-
 .actions-container button:hover::before {
   left: 100%;
-}
-
-.actions-container button:hover {
-  transform: translateY(-2px) scale(1.05);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
-}
-
-/* Botón Ver (accent) */
-.actions-container button[color="accent"] {
-  background: linear-gradient(135deg, #dc3545, #c82333) !important;
-  color: white !important;
-  border: 1px solid rgba(220, 53, 69, 0.2) !important;
-}
-
-.actions-container button[color="accent"]:hover {
-  background: linear-gradient(135deg, #c82333, #a71e2a) !important;
-  box-shadow: 0 4px 16px rgba(220, 53, 69, 0.3) !important;
-}
-
-/* Botón Editar (default) */
-.actions-container button:not([color="accent"]):not([color="warn"]) {
-  background: linear-gradient(135deg, #ffc107, #ff9800) !important;
-  color: #8b4513 !important;
-  border: 1px solid rgba(255, 193, 7, 0.2) !important;
-}
-
-.actions-container button:not([color="accent"]):not([color="warn"]):hover {
-  background: linear-gradient(135deg, #ff9800, #f57c00) !important;
-  box-shadow: 0 4px 16px rgba(255, 193, 7, 0.3) !important;
-}
-
-/* Botón Eliminar (warn) */
-.actions-container button[color="warn"] {
-  background: linear-gradient(135deg, #dc3545, #c82333) !important;
-  color: white !important;
-  border: 1px solid rgba(220, 53, 69, 0.2) !important;
-}
-
-.actions-container button[color="warn"]:hover {
-  background: linear-gradient(135deg, #c82333, #a71e2a) !important;
-  box-shadow: 0 4px 16px rgba(220, 53, 69, 0.3) !important;
-  animation: shake 0.5s ease-in-out;
 }
 
 @keyframes shake {
